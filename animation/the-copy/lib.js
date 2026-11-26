@@ -83,11 +83,29 @@ function bubble(x, y, str, k, o = {}) {
 }
 
 // ---------- Figuren (gezeichnete Menschen, Vorderansicht) ----------
-function armPath(sx, sy, hx, hy, L, side) {
-  const dx = hx - sx, dy = hy - sy, d = Math.min(Math.hypot(dx, dy), L * 2 - .01);
+// Ellbogen: von zwei möglichen Lagen immer die natürliche (nach außen und unten) wählen.
+// side = 1 → linker Arm (außen = links), side = -1 → rechter Arm (außen = rechts)
+function elbow(sx, sy, hx, hy, L, side) {
+  const dx = hx - sx, dy = hy - sy, dd = Math.hypot(dx, dy) || 1, d = Math.min(dd, L * 2 - .01);
   const mx = (sx + hx) / 2, my = (sy + hy) / 2, h = Math.sqrt(Math.max(0, L * L - d * d / 4));
-  const nx = -dy / (Math.hypot(dx, dy) || 1), ny = dx / (Math.hypot(dx, dy) || 1);
-  return `M${sx} ${sy} L${mx + nx * h * side} ${my + ny * h * side} L${hx} ${hy}`;
+  const nx = -dy / dd, ny = dx / dd;
+  const out = side > 0 ? -1 : 1;
+  const a = [mx + nx * h, my + ny * h], b = [mx - nx * h, my - ny * h];
+  const score = e => .5 * out * (e[0] - sx) + (e[1] - sy);
+  return score(a) >= score(b) ? a : b;
+}
+function armPath(sx, sy, hx, hy, L, side) {
+  const [ex, ey] = elbow(sx, sy, hx, hy, L, side);
+  return `M${sx} ${sy} L${ex} ${ey} L${hx} ${hy}`;
+}
+// Hand mit Daumen, ausgerichtet am Unterarm
+function hand(hx, hy, ex, ey, r, skin, side) {
+  const ang = Math.atan2(hy - ey, hx - ex) * 180 / Math.PI;
+  const shade = mix(skin, '#7a4a3a', .25);
+  return `<g transform="translate(${hx} ${hy}) rotate(${ang})">
+    <ellipse cx="${r * .35}" cy="${side * -r * .55}" rx="${r * .42}" ry="${r * .32}" fill="${shade}"/>
+    <ellipse cx="${r * .2}" cy="0" rx="${r * 1.05}" ry="${r * .82}" fill="${skin}"/>
+    <path d="M${r * .55} ${-r * .45} L${r * 1.05} ${-r * .45} M${r * .6} 0 L${r * 1.15} 0 M${r * .55} ${r * .45} L${r * 1.05} ${r * .45}" stroke="${shade}" stroke-width="${r * .12}" stroke-linecap="round" opacity=".6"/></g>`;
 }
 
 const HAIR = {
@@ -159,8 +177,11 @@ function person(o) {
   // Arme (Ärmel + Hand)
   const L = 70 * s, shY = n + 32 * s;
   const hL = o.hL || [x - 54 * s, n + 200 * s], hR = o.hR || [x + 54 * s, n + 200 * s];
-  const drawArm = (sx, h, side) => `<path d="${armPath(sx, shY, h[0], h[1], L, side)}" stroke="${shirt}" stroke-width="${30 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="${h[0]}" cy="${h[1]}" r="${15 * s}" fill="${skin}"/>`;
+  const drawArm = (sx, h, side) => { const [ex, ey] = elbow(sx, shY, h[0], h[1], L, side);
+    return `<path d="M${sx} ${shY} L${ex} ${ey} L${h[0]} ${h[1]}" stroke="${shirtD}" stroke-width="${35 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+      <path d="M${sx} ${shY} L${ex} ${ey} L${h[0]} ${h[1]}" stroke="${shirt}" stroke-width="${29 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M${lerp(ex, h[0], .55)} ${lerp(ey, h[1], .55)} L${h[0]} ${h[1]}" stroke="${shade}" stroke-width="${20 * s}" stroke-linecap="round" opacity="${o.sleeves === false ? 1 : 0}"/>
+      ${hand(h[0], h[1], ex, ey, 15 * s, skin, side)}`; };
   g += drawArm(x - 50 * s, hL, 1) + drawArm(x + 50 * s, hR, -1);
   if (o.item) g += o.item(hR[0], hR[1]);
   if (o.itemL) g += o.itemL(hL[0], hL[1]);

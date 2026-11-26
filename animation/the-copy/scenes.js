@@ -566,7 +566,7 @@ function sceneLab(t) {
   };
   s += person({ x: MX, neck: 560, s: 1.05, legs: 'sit', foot: FLOOR, hair: 'dad', hairCol: '#3b2a24', beard: true, shirt: CORAL, pants: '#2d3a5a', t,
     look: surprised ? [12, 0] : (scanK > 0 ? [0, -6] : [4, 0]), mouth: surprised ? 'o' : (scanK > 0 ? 'flat' : 'smile'), brows: surprised ? 'up' : (scanK > 0 ? 'worried' : 'neutral'),
-    blink: blinkAt(t, 0), hL: [MX - 120, 760], hR: [MX + 120, 760], sweat: scanK > .2 && scanK < .7 ? prog(scanK, .2, .7) : 0, hat: t < F('s13', .5) ? helmet : null });
+    blink: blinkAt(t, 0), hL: [MX - 46, 792], hR: [MX + 46, 792], sweat: scanK > .2 && scanK < .7 ? prog(scanK, .2, .7) : 0, hat: t < F('s13', .5) ? helmet : null });
   // Fortschritt
   const bk = inOut(t, F('s12', .28), F('s12', .34), F('s13', .6), F('s13', .7));
   if (bk > 0) {
