@@ -5,3 +5,7 @@ stills/
 mix_raw.wav
 mix.wav
 sfx.json
+
+.env
+node_modules/
+short_parts/

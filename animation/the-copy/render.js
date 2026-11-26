@@ -16,7 +16,11 @@ async function newPage(browser, scale = 2) {
   const page = await browser.newPage({ viewport: { width: 960, height: 540 }, deviceScaleFactor: scale });
   await page.addInitScript(tl => { window.TIMELINE = tl; }, timeline);
   page.on('pageerror', e => { console.error('Seitenfehler:', e.message); process.exitCode = 1; });
-  await page.goto('file://' + path.join(dir, 'scene.html'));
+  await page.goto(require('url').pathToFileURL(path.join(dir, 'scene.html')).href);
+  // Alle Schnitte vorab laden (sonst fehlen sie im ersten Bild, das sie braucht)
+  await page.evaluate(() => Promise.all(
+    [400, 500, 600, 700, 800, 900].map(w => document.fonts.load(`${w} 20px Inter`))
+      .concat([400, 500, 600, 700, 800].map(w => document.fonts.load(`${w} 20px "JetBrains Mono"`)))));
   await page.evaluate(() => document.fonts.ready);
   return page;
 }
@@ -35,7 +39,10 @@ async function newPage(browser, scale = 2) {
     }
     await browser.close();
     if (arg('--sheet')) {
-      execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-pattern_type', 'glob', '-i', path.join(stillsDir, 'still_*.png'),
+      // Liste statt Glob (funktioniert auch unter Windows)
+      const list = path.join(stillsDir, 'list.txt');
+      fs.writeFileSync(list, times.map(t => `file '${path.join(stillsDir, `still_${String(t).padStart(6, '0')}.png`).replace(/\\/g, '/')}'`).join('\n'));
+      execFileSync('ffmpeg', ['-loglevel', 'error', '-y', '-f', 'concat', '-safe', '0', '-i', list,
         '-vf', 'scale=480:270,tile=6x9', '-frames:v', '1', path.join(stillsDir, 'sheet.png')]);
     }
     return;
@@ -46,7 +53,7 @@ async function newPage(browser, scale = 2) {
   const sfx = await probe.evaluate(() => window.SFX);
   await probe.close();
   fs.writeFileSync(path.join(dir, 'sfx.json'), JSON.stringify(sfx));
-  execFileSync('python3', [path.join(dir, 'mix.py')], { stdio: 'inherit' });
+  execFileSync(process.platform === 'win32' ? 'python' : 'python3',[path.join(dir, 'mix.py')], { stdio: 'inherit' });
 
   // Bilder
   const framesDir = path.join(dir, 'frames');
