@@ -220,6 +220,13 @@ function robot(o) {
     g += lim(x - 30 * s, n + 200 * s, x - 34 * s, o.foot - 16) + lim(x + 30 * s, n + 200 * s, x + 34 * s, o.foot - 16) +
       `<rect x="${x - 76 * s}" y="${o.foot - 26 * s}" width="${58 * s}" height="${26 * s}" rx="${10 * s}" fill="${dark}"/><rect x="${x + 18 * s}" y="${o.foot - 26 * s}" width="${58 * s}" height="${26 * s}" rx="${10 * s}" fill="${dark}"/>`;
   }
+  if (o.legs === 'sit') {
+    const seg = (x1, y1, x2, y2) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${shade}" stroke-width="${30 * s}" stroke-linecap="round"/><line x1="${x1 - 4}" y1="${y1}" x2="${x2 - 4}" y2="${y2}" stroke="${body}" stroke-width="${20 * s}" stroke-linecap="round"/>`;
+    [-1, 1].forEach(sd => {
+      g += seg(x + sd * 30 * s, n + 196 * s, x + sd * 44 * s, n + 236 * s) + seg(x + sd * 44 * s, n + 236 * s, x + sd * 44 * s, o.foot - 18);
+      g += `<circle cx="${x + sd * 44 * s}" cy="${n + 236 * s}" r="${14 * s}" fill="${joint}"/><rect x="${x + sd * 44 * s - 30 * s}" y="${o.foot - 26 * s}" width="${60 * s}" height="${26 * s}" rx="${10 * s}" fill="${dark}"/>`;
+    });
+  }
   g += `<rect x="${x - 66 * s}" y="${n + 8 * s}" width="${132 * s}" height="${210 * s}" rx="${42 * s}" fill="${shade}"/>
     <rect x="${x - 66 * s}" y="${n + 8 * s}" width="${118 * s}" height="${204 * s}" rx="${42 * s}" fill="${body}"/>
     <rect x="${x - 40 * s}" y="${n + 150 * s}" width="${64 * s}" height="${12 * s}" rx="${6 * s}" fill="${shade}"/>

@@ -4,14 +4,14 @@ const cam = (sc, fx, fy) => `translate(960 540) scale(${sc}) translate(${-fx} ${
 const camLerp = (k, a, b) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
 
 // ======================= ESSZIMMER =======================
-const TY = 820;                      // Tischkante
+const TY = 700, FLOOR = 990, SEATY = 780;   // Tischkante, Boden, Sitzhöhe                      // Tischkante
 const SEAT = { mom: 430, lily: 800, ben: 1150, bot: 1500 };
 const eat = (t, ph) => { const c = ((t + ph) % 2.6) / 2.6; return c < .5 ? ease(c * 2) : ease((1 - c) * 2); };
 
 function room(t, dayK = 0) {
   let s = `<linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c1f33"/><stop offset=".65" stop-color="#5a3446"/><stop offset="1" stop-color="#6e3d4a"/></linearGradient>
-  <rect x="-400" y="-400" width="${W + 800}" height="${TY + 500}" fill="url(#wall)"/>`;
-  for (let i = -4; i < 24; i++) s += `<rect x="${i * 100}" y="-400" width="34" height="${TY + 500}" fill="#fff" opacity=".022"/>`;
+  <rect x="-400" y="-400" width="${W + 800}" height="${FLOOR + 400}" fill="url(#wall)"/>`;
+  for (let i = -4; i < 24; i++) s += `<rect x="${i * 100}" y="-400" width="34" height="${FLOOR + 400}" fill="#fff" opacity=".022"/>`;
   const top = mix('#101a3d', '#6fc3ff', dayK), bot = mix('#2a2d5e', '#ffd6a0', dayK);
   s += `<linearGradient id="win" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bot}"/></linearGradient>
   <rect x="80" y="120" width="300" height="360" rx="16" fill="#1c1420"/><rect x="96" y="136" width="268" height="328" rx="8" fill="url(#win)"/>`;
@@ -29,7 +29,7 @@ function lamp(t) {
     <ellipse cx="960" cy="308" rx="52" ry="14" fill="#fff6d8"/>`;
 }
 // Bilderrahmen; Nr. 0 = Papa (Gold), weitere erscheinen im Zeitraffer
-const FRAMES = [[1700, 190, 'dad'], [1830, 260, 'a'], [1580, 330, 'b'], [1280, 170, 'mom'], [1420, 210, 'c'], [1880, 110, 'd']];
+const FRAMES = [[1700, 190, 'dad'], [1830, 260, 'a'], [1610, 300, 'b'], [1280, 170, 'mom'], [1420, 210, 'c'], [1880, 110, 'd']];
 function frames(n, hl = 0) {
   let s = '';
   FRAMES.forEach(([fx, fy, who], i) => {
@@ -39,55 +39,66 @@ function frames(n, hl = 0) {
       ${i === 0 && hl > 0 ? `<rect x="-90" y="-104" width="180" height="208" rx="20" fill="${SUN}" opacity="${hl * .5}" filter="url(#glow)"/>` : ''}
       <rect x="-66" y="-80" width="132" height="160" rx="8" fill="${gold ? '#d9a84e' : '#3a2433'}"/>
       <rect x="-54" y="-68" width="108" height="136" rx="4" fill="${gold ? '#f6e6c4' : '#e8cdb4'}"/>
-      <g transform="translate(0 -6) scale(.42)">${miniFace(who)}</g>
+      <clipPath id="fc${i}"><rect x="-54" y="-68" width="108" height="136" rx="4"/></clipPath>
+      <g clip-path="url(#fc${i})"><g transform="translate(0 -10) scale(.5)">${miniFace(who)}</g></g>
       ${gold ? `<path d="M30 -80 L66 -80 L66 -44 Z" fill="#1a1018"/>` : ''}</g>`;
   });
   return s;
 }
 function miniFace(who) {
   const cfg = { dad: ['dad', '#3b2a24', '#f2c6a0', CORAL], mom: ['mom', '#8a5a3c', '#f6d1b0', '#3fae7a'], a: ['short', '#222', '#c98d64', '#4cc9f0'], b: ['long', '#e0b050', '#f6d1b0', '#b07cff'], c: ['ben', '#5a3a2a', '#e8b48c', SUN], d: ['pony', '#222', '#8d5a3c', CORAL] }[who] || ['short', '#333', '#f2c6a0', '#888'];
-  return person({ x: 0, neck: 60, hair: cfg[0], hairCol: cfg[1], skin: cfg[2], shirt: cfg[3], beard: who === 'dad', mouth: 'smile' });
+  return person({ x: 0, neck: 76, hair: cfg[0], hairCol: cfg[1], skin: cfg[2], shirt: cfg[3], beard: who === 'dad', mouth: 'smile' });
 }
 function plant(k) {
   const sc = lerp(.9, 2.0, k); let l = '';
   for (let i = 0; i < 7; i++) l += `<g transform="rotate(${-90 + (i - 3) * 24})"><ellipse cx="${55 + (i % 3) * 18}" cy="0" rx="${55 + (i % 3) * 18}" ry="20" fill="${i % 2 ? '#3fae7a' : '#2e8c62'}"/></g>`;
-  return `<g transform="translate(1860 ${TY + 40}) scale(${sc})">${l}<path d="M-42 0 L42 0 L32 86 L-32 86 Z" fill="#c8643f"/></g>`;
+  return `<g transform="translate(1860 ${FLOOR - 86}) scale(${sc})">${l}<path d="M-42 0 L42 0 L32 86 L-32 86 Z" fill="#c8643f"/></g>`;
 }
 function table() {
-  return `<rect x="150" y="${TY}" width="1660" height="28" rx="10" fill="#f9f3ea"/>
-    <rect x="164" y="${TY + 24}" width="1632" height="230" fill="#efe5d6"/>
-    <rect x="164" y="${TY + 24}" width="1632" height="14" fill="#000" opacity=".08"/>
-    <rect x="164" y="${TY + 214}" width="1632" height="40" fill="${CORAL}"/>
-    ${Array.from({ length: 41 }, (_, i) => `<circle cx="${184 + i * 40}" cy="${TY + 254}" r="11" fill="${CORAL}"/>`).join('')}
-    <rect x="-400" y="${TY + 264}" width="${W + 800}" height="600" fill="#1e141c"/>`;
+  return `<rect x="220" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/><rect x="1706" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/>
+    <rect x="150" y="${TY}" width="1660" height="28" rx="10" fill="#f9f3ea"/>
+    <rect x="164" y="${TY + 24}" width="1632" height="40" fill="#efe5d6"/>
+    <rect x="164" y="${TY + 24}" width="1632" height="10" fill="#000" opacity=".08"/>
+    <rect x="164" y="${TY + 56}" width="1632" height="18" fill="${CORAL}"/>
+    ${Array.from({ length: 41 }, (_, i) => `<circle cx="${184 + i * 40}" cy="${TY + 74}" r="10" fill="${CORAL}"/>`).join('')}`;
+}
+function floorAndChairs(seats) {
+  let s = `<rect x="-400" y="${FLOOR}" width="${W + 800}" height="600" fill="#3a2630"/><rect x="-400" y="${FLOOR - 14}" width="${W + 800}" height="16" fill="#2a1a22"/>`;
+  for (let i = 0; i < 6; i++) s += `<rect x="-400" y="${FLOOR + 22 + i * 30}" width="${W + 800}" height="3" fill="#000" opacity=".15"/>`;
+  s += `<ellipse cx="960" cy="${FLOOR + 6}" rx="900" ry="26" fill="#000" opacity=".25"/>`;
+  seats.forEach(x => s += `<rect x="${x - 92}" y="${SEATY - 290}" width="184" height="300" rx="34" fill="#5a3a2e"/><rect x="${x - 76}" y="${SEATY - 274}" width="152" height="268" rx="26" fill="#6b4636"/>
+    <rect x="${x - 100}" y="${SEATY + 4}" width="200" height="26" rx="10" fill="#5a3a2e"/>
+    <rect x="${x - 92}" y="${SEATY + 28}" width="18" height="${FLOOR - SEATY - 30}" fill="#4a2e24"/><rect x="${x + 74}" y="${SEATY + 28}" width="18" height="${FLOOR - SEATY - 30}" fill="#4a2e24"/>`);
+  return s;
 }
 
 // Familie: gibt SVG für alle Personen zurück; st = Zustandsobjekt
 function family(t, st) {
   let s = '';
-  const N = TY - 260;
+  const N = SEATY - 230;
   if (st.momOp > 0) {
     const toM = st.eat ? eat(t, .3) : 0;
     s += person({ x: SEAT.mom, neck: N, hair: 'mom', hairCol: mix('#8a5a3c', '#d8d8de', st.momGrey || 0), skin: '#f6d1b0', shirt: '#3fae7a', t,
       look: st.momLook || [6, 0], mouth: st.momMouth || 'smile', brows: st.momBrows, blink: blinkAt(t, 1), op: st.momOp, age: st.momGrey,
-      hL: [SEAT.mom - 60, TY - 6], hR: [SEAT.mom + 50 - toM * 30, TY - 10 - toM * 240], item: (x, y) => fork(x, y, toM) });
+      legs: 'sit', foot: FLOOR, pants: '#3a3550', hL: [SEAT.mom - 60, TY - 6], hR: [SEAT.mom + 50 - toM * 30, TY - 10 - toM * 160], item: (x, y) => fork(x, y, toM) });
   }
   if (st.lilyOp > 0) {
-    const ls = st.lilyS || .8, ln = lerp(N + 90, N, (ls - .8) / .2);
+    const ls = st.lilyS || .8, ln = SEATY - 230 * ls;
     const toM = st.eat && !st.lilyHand ? eat(t, 1.1) : 0;
-    let hR = [SEAT.lily + 46 * ls - toM * 26, TY - 10 - toM * 220 * ls];
+    let hR = [SEAT.lily + 46 * ls - toM * 26, TY - 10 - toM * (TY - ln + 20)];
     if (st.lilyHand) hR = [lerp(hR[0], SEAT.lily + 80, st.lilyHand), lerp(hR[1], ln - 60, st.lilyHand)];
     s += person({ x: SEAT.lily, neck: ln, s: ls, hair: st.lilyHair || 'lily', hairCol: mix('#c0642e', '#d8d8de', st.lilyGrey || 0), skin: '#f8d8bc', shirt: SUN, t,
       look: st.lilyLook || [0, 0], mouth: st.lilyMouth || 'smile', brows: st.lilyBrows, blink: blinkAt(t, 3), op: st.lilyOp, age: st.lilyGrey,
-      hL: [SEAT.lily - 50 * ls, TY - 6], hR, item: st.lilyHand ? null : (x, y) => fork(x, y, toM) });
+      legs: 'sit', foot: FLOOR - 30 * (1 - ls) / .2, pants: '#4a5a8a', hL: [SEAT.lily - 50 * ls, TY - 6], hR, item: st.lilyHand ? null : (x, y) => fork(x, y, toM) });
   }
   if (st.benOp > 0) {
     const toM = st.eat && !st.benPalm ? eat(t, 1.9) : 0;
     let hL = [SEAT.ben - 60, TY - 6];
-    if (st.benPalm) hL = [lerp(hL[0], SEAT.ben - 10, st.benPalm), lerp(hL[1], N - 70, st.benPalm)];
-    s += person({ x: SEAT.ben, neck: N + 10, s: .95, hair: 'ben', hairCol: mix('#2a1c16', '#d8d8de', st.benGrey || 0), skin: '#e8b48c', shirt: '#4c6ef5', t,
+    const bn = SEATY - 230 * .95;
+    if (st.benPalm) hL = [lerp(hL[0], SEAT.ben - 10, st.benPalm), lerp(hL[1], bn - 70, st.benPalm)];
+    s += person({ x: SEAT.ben, neck: bn, s: .95, hair: 'ben', hairCol: mix('#2a1c16', '#d8d8de', st.benGrey || 0), skin: '#e8b48c', shirt: '#4c6ef5', t,
       look: st.benLook || [-4, 0], mouth: st.benMouth || 'smile', brows: st.benBrows, blink: blinkAt(t, 5), op: st.benOp, age: st.benGrey,
-      hL, hR: [SEAT.ben + 50 - toM * 30, TY - 10 - toM * 230], item: (x, y) => fork(x, y, toM) });
+      legs: 'sit', foot: FLOOR, pants: '#2d3a5a', hL, hR: [SEAT.ben + 50 - toM * 30, TY - 10 - toM * 160], item: (x, y) => fork(x, y, toM) });
   }
   (st.extra || []).forEach(e => s += e);
   return s;
@@ -95,8 +106,8 @@ function family(t, st) {
 
 // Roboter am Tisch inkl. Öl-Handlung. st.pour/st.drink 0..1
 function botAtTable(t, st) {
-  const bx = SEAT.bot, n = TY - 260, CAN = [1700, TY + 4], GL = [1620, TY + 2];
-  let hR = [bx + 70, TY - 8], hL = [bx - 70, TY - 8], can = CAN, canTilt = 0, gp = GL, gTilt = 0, level = st.level ?? .7;
+  const bx = SEAT.bot, n = SEATY - 205, CAN = [1700, TY + 4], GL = [1620, TY + 2];
+  let hR = [bx + 84, TY + 44], hL = [bx - 84, TY + 44], can = CAN, canTilt = 0, gp = GL, gTilt = 0, level = st.level ?? .7;
   if (st.reach > 0) {
     can = [lerp(CAN[0], 1660, st.lift || 0), lerp(CAN[1], TY - 150, st.lift || 0)];
     canTilt = -55 * (st.pour || 0);
@@ -108,7 +119,7 @@ function botAtTable(t, st) {
   }
   if (st.wave > 0) hL = [lerp(hL[0], bx - 120 + Math.sin(t * 11) * 22, st.wave), lerp(hL[1], n - 70, st.wave)];
   if (st.hRover) hR = st.hRover;
-  let s = robot({ x: bx, neck: n, s: .92, t, eyes: st.eyes || 'on', look: st.look || [-4, 0], blink: blinkAt(t, 6), hR, hL, steam: st.steam || 0,
+  let s = robot({ x: bx, neck: n, s: .92, t, legs: 'sit', foot: FLOOR, eyes: st.eyes || 'on', look: st.look || [-4, 0], blink: blinkAt(t, 6), hR, hL, steam: st.steam || 0,
     mouth: st.mouth, patch: st.patch, item: st.item, screen: st.screen });
   if ((st.pour || 0) > .3) {
     const a = (canTilt - 42) * Math.PI / 180, sx = can[0] + Math.cos(a) * 150, sy = can[1] + Math.sin(a) * 150;
@@ -119,7 +130,7 @@ function botAtTable(t, st) {
 }
 
 function dinnerBase(t, o) {
-  let s = room(t, o.dayK || 0) + frames(o.frames ?? 3, o.dadHl || 0) + lamp(t) + plant(o.plant || 0);
+  let s = room(t, o.dayK || 0) + frames(o.frames ?? 3, o.dadHl || 0) + lamp(t) + floorAndChairs([SEAT.mom, SEAT.lily, SEAT.ben, SEAT.bot]) + plant(o.plant || 0);
   s += family(t, o.fam);
   s += botAtTable(t, o.bot);
   s += plate(SEAT.mom, TY + 4, true, t, o.fam.momOp > 0 || o.platesAll ? 1 : 0);
@@ -159,18 +170,18 @@ function sceneDinnerOpen(t) {
   if (ask > 0) { fam.lilyHand = ask * .7; fam.lilyMouth = t < F('s03', .7) ? 'open' : 'flat'; fam.lilyLook = [10, -2]; }
   if (t > F('s03', .76)) { fam.lilyLook = [0, 8]; fam.lilyMouth = 'flat'; fam.lilyBrows = 'sad'; fam.momLook = [10, 0]; fam.momBrows = 'worried'; }
   // Kamera
-  let c = [1.1, 960, 500];
+  let c = [1.0, 960, 540];
   const zBot = inOut(t, F('s01', .45), F('s01', .55), F('s01', .72), F('s01', .8));
   const zPh = inOut(t, F('s01', .74), F('s01', .84), E('s01') + .3, S('s02') + .3);
-  c = camLerp(ease(zBot), c, [1.45, 1500, 530]);
+  c = camLerp(ease(zBot), c, [1.45, 1500, 560]);
   c = camLerp(ease(zPh), c, [1.9, 1700, 260]);
   const zOil = inOut(t, r0 - .2, r0 + .4, d0 + 2.4, d0 + 3.2);
-  c = camLerp(zOil * .6, c, [1.35, 1560, 620]);
+  c = camLerp(zOil * .6, c, [1.35, 1560, 600]);
   const zLily = ease(prog(t, F('s03', .45), E('s03')));
-  c = camLerp(zLily * .7, c, [1.5, 820, 540]);
+  c = camLerp(zLily * .7, c, [1.5, 800, 600]);
   c[0] *= 1 + .03 * Math.sin(t * .3);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot, dadHl: photoK })}
-    ${bubble(1380, 310, "…and then the toaster said: I'm toast!", joke, { robot: true, tail: 80, size: 34, maxW: 520 })}
+    ${bubble(1360, 360, "…and then the toaster said: I'm toast!", joke, { robot: true, tail: 80, size: 34, maxW: 520 })}
     ${photoK > 0 ? tag('IN LOVING MEMORY · 2077', 1585, 330, photoK, SUN) : ''}</g>`;
   s += headline(['WOULD YOU SIT', 'AT THIS TABLE?'], 960, 150, t, F('s03', .02), F('s03', .42), { size: 96 });
   return s;
@@ -186,7 +197,7 @@ function sceneDinnerAd(t) {
     hRover: [lerp(SEAT.bot + 70, SEAT.bot + 150, box), lerp(TY - 8, 480, box)],
     item: (x, y) => box > 0 ? cereal(x + 30, y - 10, box) : '',
   };
-  const c = camLerp(ease(prog(t, a, a + 1.2)), [1.1, 960, 500], [1.45, 1440, 530]);
+  const c = camLerp(ease(prog(t, a, a + 1.2)), [1.0, 960, 540], [1.45, 1440, 560]);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot })}
     ${sparkles(1640, 390, t, box)}</g>`;
   s += tag('SPONSORED MESSAGE', 60, 60, prog(t, a + .4, a + .8), SUN);
@@ -222,16 +233,16 @@ function sceneDinnerLapse(t) {
   };
   const kidIn = back(prog(k, .68, .78)), kid2 = back(prog(k, .74, .84));
   fam.extra = [];
-  if (kidIn > 0) fam.extra.push(`<g transform="translate(${SEAT.mom} ${TY}) scale(${kidIn}) translate(${-SEAT.mom} ${-TY})">` +
-    person({ x: SEAT.mom, neck: TY - 160, s: .78, hair: 'short', hairCol: '#222', skin: '#c98d64', shirt: '#4cc9f0', look: [8, 0], blink: blinkAt(t, 8), mouth: 'grin', hL: [SEAT.mom - 44, TY - 6], hR: [SEAT.mom + 44, TY - 6] }) + '</g>');
-  if (kid2 > 0) fam.extra.push(`<g transform="translate(${SEAT.ben} ${TY}) scale(${kid2}) translate(${-SEAT.ben} ${-TY})">` +
-    person({ x: SEAT.ben, neck: TY - 150, s: .76, hair: 'long', hairCol: '#e0b050', skin: '#f6d1b0', shirt: '#b07cff', look: [10, -2], blink: blinkAt(t, 9), mouth: 'smile', hL: [SEAT.ben - 44, TY - 6], hR: [SEAT.ben + 44, TY - 6] }) + '</g>');
+  if (kidIn > 0) fam.extra.push(`<g transform="translate(${SEAT.mom} ${FLOOR}) scale(${kidIn}) translate(${-SEAT.mom} ${-FLOOR})">` +
+    person({ x: SEAT.mom, neck: SEATY - 230 * .78, s: .78, legs: 'sit', foot: FLOOR - 40, pants: '#2d3a5a', hair: 'short', hairCol: '#222', skin: '#c98d64', shirt: '#4cc9f0', look: [8, 0], blink: blinkAt(t, 8), mouth: 'grin', hL: [SEAT.mom - 44, TY - 6], hR: [SEAT.mom + 44, TY - 6] }) + '</g>');
+  if (kid2 > 0) fam.extra.push(`<g transform="translate(${SEAT.ben} ${FLOOR}) scale(${kid2}) translate(${-SEAT.ben} ${-FLOOR})">` +
+    person({ x: SEAT.ben, neck: SEATY - 230 * .76, s: .76, legs: 'sit', foot: FLOOR - 40, pants: '#3a3550', hair: 'long', hairCol: '#e0b050', skin: '#f6d1b0', shirt: '#b07cff', look: [10, -2], blink: blinkAt(t, 9), mouth: 'smile', hL: [SEAT.ben - 44, TY - 6], hR: [SEAT.ben + 44, TY - 6] }) + '</g>');
   // Roboter trinkt immer wieder
   const c = (t * 1.5) % 1, dk = k > 0 && k < 1 ? (c < .5 ? ease(c * 2) : ease((1 - c) * 2)) : 0;
   const fin = F('s22', .86);
   const bot = { drink: Math.max(dk, inOut(t, fin, fin + .4, fin + 1.2, fin + 1.6)), level: .6, eyes: (dk > .5 || (t > fin + .3 && t < fin + 1.8)) ? 'happy' : 'on', patch: clamp((k - .55) * 6), steam: prog(t, fin + 1.0, fin + 2.2) };
   const frameN = 3 + ease(prog(k, .45, .95)) * 3;
-  let s = `<g transform="${cam(1.1 + .03 * k, 960, 500)}">${dinnerBase(t, { fam, bot, dayK, frames: frameN, plant: ease(k), platesAll: kidIn > 0 })}</g>`;
+  let s = `<g transform="${cam(1.0 + .03 * k, 960, 540)}">${dinnerBase(t, { fam, bot, dayK, frames: frameN, plant: ease(k), platesAll: kidIn > 0 })}</g>`;
   // Jahreszähler
   const yk = inOut(t, S('s22') + .2, S('s22') + .7, E('s22') + .1, E('s22') + .5);
   if (yk > 0) {
@@ -256,10 +267,10 @@ function sceneDinnerPayoff(t) {
     fam.lilyMouth = t > F('s25', .85) ? 'smile' : 'flat';
   }
   fam.t = t;
-  let c = [1.1, 960, 500];
-  c = camLerp(ease(prog(t, S('s24') - .4, S('s24') + .6)), c, [1.55, 820, 530]);
-  c = camLerp(ease(prog(t, S('s25') - .2, S('s25') + .8)), c, [1.7, 1480, 510]);
-  c = camLerp(ease(prog(t, F('s25', .84), E('s25'))), c, [2.1, 1500, 480]);
+  let c = [1.0, 960, 540];
+  c = camLerp(ease(prog(t, S('s24') - .4, S('s24') + .6)), c, [1.55, 800, 600]);
+  c = camLerp(ease(prog(t, S('s25') - .2, S('s25') + .8)), c, [1.7, 1480, 560]);
+  c = camLerp(ease(prog(t, F('s25', .84), E('s25'))), c, [2.0, 1500, 520]);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot })}</g>`;
   s += bubble(760, 170, 'Dad? Are you still you?', inOut(t, S('s24') + .1, S('s24') + .4, E('s24') + 1.2, E('s24') + 1.5), { tail: 40, size: 44 });
   s += bubble(1240, 150, 'I think so.', inOut(t, S('s25') + .1, S('s25') + .4, F('s25', .4), F('s25', .45)), { robot: true, tail: 120, size: 40 });
@@ -657,7 +668,7 @@ function sceneTwoDads(t) {
 
 // ======================= GESCHÄFT & REGELN =======================
 function warnCard(x, y, k, title, icon) {
-  return card(x, y, 520, 230, k, `${icon}${text(title, 60, 0, { size: 44, fill: '#fff' })}`, { fill: '#2a1418', stroke: CORAL });
+  return card(x, y, 620, 200, k, `<g transform="translate(-60 0)">${icon}</g>${text(title, -150, 2, { size: 44, anchor: 'start', fill: '#fff' })}`, { fill: '#2a1418', stroke: CORAL });
 }
 function sceneBusiness(t) {
   let s = bgGrad('bz', '#06121c', '#10283a') + grid(.035);
@@ -667,8 +678,8 @@ function sceneBusiness(t) {
   const cart = `<g transform="translate(-170 0)"><path d="M-40 -30 L-26 -30 L-10 26 L40 26 L52 -14 L-20 -14" stroke="${CORAL}" stroke-width="8" fill="none" stroke-linejoin="round"/><circle cx="-4" cy="44" r="9" fill="${CORAL}"/><circle cx="34" cy="44" r="9" fill="${CORAL}"/></g>`;
   const kid = `<g transform="translate(-170 0)"><circle cx="0" cy="-10" r="34" fill="#f8d8bc"/><circle cx="-12" cy="-14" r="5" fill="${INK}"/><circle cx="12" cy="-14" r="5" fill="${INK}"/>${text('?', 44, -50, { size: 50, fill: CORAL })}<path d="M-30 50 C -30 20, 30 20, 30 50 Z" fill="${SUN}"/></g>`;
   const ghost = `<g transform="translate(-170 0)"><path d="M-36 50 L-36 -10 C -36 -60, 36 -60, 36 -10 L36 50 L24 38 L12 50 L0 38 L-12 50 L-24 38 Z" fill="#eef2f6"/><circle cx="-12" cy="-10" r="7" fill="${INK}"/><circle cx="12" cy="-10" r="7" fill="${INK}"/></g>`;
-  s += warnCard(400, 330, prog(t, F('s18', .55), F('s18', .62)), 'SELL YOU THINGS', cart);
-  s += warnCard(400, 720, prog(t, F('s18', .7), F('s18', .77)), 'CONFUSE KIDS', kid);
+  s += warnCard(410, 330, prog(t, F('s18', .55), F('s18', .62)), 'SELL YOU THINGS', cart);
+  s += warnCard(410, 720, prog(t, F('s18', .7), F('s18', .77)), 'CONFUSE KIDS', kid);
   s += warnCard(1520, 520, prog(t, F('s18', .82), F('s18', .89)), 'HAUNT PEOPLE', ghost);
   return s;
 }
@@ -785,9 +796,9 @@ function questionCard(t) {
   const born = F('s03', .58), park = F('s03', .92), back0 = S('s23'), open = F('s23', .7), gone = S('s24') + .35;
   if (t < born || t > gone) return '';
   let x, y, sc;
-  if (t < park) { const k = ease(prog(t, born + .6, park)); x = lerp(960, 1800, k); y = lerp(420, 90, k); sc = lerp(1.6, .6, k) * back(prog(t, born, born + .4)); }
+  if (t < park) { const k = ease(prog(t, born + .6, park)); x = lerp(960, 1800, k); y = lerp(230, 90, k); sc = lerp(1.6, .6, k) * back(prog(t, born, born + .4)); }
   else if (t < back0) { x = 1800; y = 90; sc = .6 * (1 + .08 * pulse((t - park) % 9, 0, .6)); }
-  else { const k = ease(prog(t, back0, back0 + 1)); x = lerp(1800, 960, k); y = lerp(90, 480, k); sc = lerp(.6, 2.2, k); }
+  else { const k = ease(prog(t, back0, back0 + 1)); x = lerp(1800, 960, k); y = lerp(90, 250, k); sc = lerp(.6, 1.8, k); }
   const openK = ease(prog(t, open, open + .6));
   const fade = 1 - prog(t, S('s24'), gone);
   return `<g transform="translate(${x} ${y}) scale(${sc})" opacity="${fade}">

@@ -54,12 +54,28 @@ def sfx(kind):
     if kind == "tick2": return tone(1000, .15, None, .05) * .25 + tone(1500, .15, None, .04) * .15
     if kind == "chime_low": return (tone(392, 1.6, None, .6) + .6 * tone(587, 1.6, None, .5) + .3 * tone(784, 1.6, None, .4)) * .2
     if kind == "power": return (tone(880, 2, None, .8) + .6 * tone(1318, 2, None, .7) + .4 * tone(1760, 2, None, .6) + tone(110, 2, 55, .5)) * .2
-    if kind == "glug":
-        n = lowpass(noise(1.1), .05); am = .5 + .5 * np.sin(2 * np.pi * 9 * np.arange(len(n)) / SR); return n * am * 2.2
-    if kind == "gulp":
-        n = lowpass(noise(.9), .04); am = .5 + .5 * np.sin(2 * np.pi * 4 * np.arange(len(n)) / SR); return n * am * 2.4
+    if kind == "glug":    # Einschenken: viele kleine Blasen, Tonhöhe steigt beim Füllen
+        dur = 1.1; out = np.zeros(int(dur * SR)); tt = 0.0
+        while tt < dur - .06:
+            fill = tt / dur
+            f0 = 380 + 520 * fill + rng.uniform(-60, 120)
+            n = int(.05 * SR); tau = np.arange(n) / SR
+            f = f0 * (1 + 2.2 * tau / .05)
+            b = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tau / .016) * rng.uniform(.08, .22)
+            i = int(tt * SR); out[i:i + n] += b[:len(out) - i]
+            tt += rng.exponential(1 / 30)
+        stream = lowpass(noise(dur), .12) * .05 * np.sin(np.linspace(0, np.pi, len(out))) ** .5
+        return (out + stream) * np.minimum(1, np.arange(len(out)) / (SR * .04))
+    if kind == "gulp":    # drei Schlucke
+        out = np.zeros(int(1.0 * SR))
+        for k, at in enumerate([0, .32, .64]):
+            n = int(.11 * SR); tau = np.arange(n) / SR
+            f = 170 * (1 + 1.6 * tau / .11)
+            g = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tau / .045) * .45
+            i = int(at * SR); out[i:i + n] += g
+        return out
     if kind == "hiss":
-        n = noise(1.2); return (n - lowpass(n, .4)) * env(len(n), .01, .35) * .25
+        n = noise(1.2); return (n - lowpass(n, .4)) * env(len(n), .01, .3) * .12
     if kind == "boom":
         return tone(80, 1.6, 35, .5) * .7 + lowpass(noise(1.6), .03) * env(int(1.6 * SR), .005, .3) * 1.5
     if kind == "glitch":
