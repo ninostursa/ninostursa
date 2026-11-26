@@ -1,4 +1,4 @@
-/* Szenen für "Filed Under Future – File 001: The Copy". Jede Szene: fn(t) → SVG-String (Weltkoordinaten 1920x1080). */
+/* Szenen für "Patent Future – File 001: The Copy". Jede Szene: fn(t) → SVG-String (Weltkoordinaten 1920x1080). */
 
 const cam = (sc, fx, fy) => `translate(960 540) scale(${sc}) translate(${-fx} ${-fy})`;
 const camLerp = (k, a, b) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)];
@@ -286,7 +286,7 @@ function sceneTitle(t) {
   s += `<rect x="0" y="${scan}" width="${W}" height="6" fill="${MINT}" opacity=".25" filter="url(#soft)"/>`;
   s += `<g opacity="${.25 * prog(t, a, a + 1)}">${robot({ x: 1560, neck: 560, s: 1.6, t, eyes: 'on', legs: 'stand', foot: 1300 })}</g>`;
   const k1 = back(prog(t, a + .1, a + .5));
-  s += `<g transform="translate(960 300) scale(${k1})" opacity="${clamp(k1)}"><rect x="-420" y="-56" width="840" height="112" rx="18" fill="none" stroke="${MINT}" stroke-width="6"/>${text('FILED UNDER FUTURE', 0, 4, { size: 64, fill: MINT, ls: 5, glow: MINT })}</g>`;
+  s += `<g transform="translate(960 300) scale(${k1})" opacity="${clamp(k1)}"><rect x="-340" y="-56" width="680" height="112" rx="18" fill="none" stroke="${MINT}" stroke-width="6"/>${text('PATENT FUTURE', 0, 4, { size: 70, fill: MINT, ls: 6, glow: MINT })}</g>`;
   const k2 = prog(t, F('s04', .36), F('s04', .46));
   if (k2 > 0) { const str = 'FILE 001'.slice(0, Math.ceil(k2 * 8)); s += text(str, 960, 450, { size: 56, font: 'JetBrains Mono', weight: 800, fill: '#d9f7ee', ls: 10 }); }
   const k3 = prog(t, F('s04', .64), F('s04', .72));
@@ -747,7 +747,7 @@ function sceneOutro(t) {
   const pk = back(prog(t, S('s26'), S('s26') + .5)) * (1 - toNext);
   if (pk > 0) {
     s += `<g transform="translate(700 560) rotate(-3) scale(${pk})"><rect x="-330" y="-430" width="660" height="860" rx="10" fill="#f4efe6"/>
-      ${text('FILED UNDER FUTURE', 0, -370, { size: 40, fill: INK, ls: 3 })}${text('FILE 001 · THE COPY', 0, -320, { size: 30, font: 'JetBrains Mono', weight: 800, fill: '#555' })}
+      ${text('PATENT FUTURE', 0, -370, { size: 46, fill: INK, ls: 4 })}${text('FILE 001 · THE COPY', 0, -320, { size: 30, font: 'JetBrains Mono', weight: 800, fill: '#555' })}
       <line x1="-280" y1="-290" x2="280" y2="-290" stroke="#999" stroke-width="3"/>
       <g opacity=".75">${robot({ x: 0, neck: 20, s: .85, t, eyes: 'on' })}</g>
       ${Array.from({ length: 4 }, (_, i) => `<rect x="-280" y="${280 + i * 34}" width="${560 - (i % 2) * 140}" height="12" rx="6" fill="#c9c2b6"/>`).join('')}</g>`;
