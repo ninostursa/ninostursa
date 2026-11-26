@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>html, body { margin: 0; padding: 0; background: #000; overflow: hidden; } svg { display: block; }</style>
+</head>
+<body>
+<svg id="stage" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="../the-copy/lib.js"></script>
+<script>
+/* Kanal-Grafiken für "Patent Future": ?mode=avatar (800x800) oder ?mode=banner (2560x1440) */
+const mode = new URLSearchParams(location.search).get('mode') || 'avatar';
+const DEFS = `<defs>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+  <filter id="glow" x="-40%" y="-60%" width="180%" height="220%"><feGaussianBlur stdDeviation="22"/></filter>
+  <filter id="glowS" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <radialGradient id="bulbG" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#d9fff3"/><stop offset=".55" stop-color="#7af5d0"/><stop offset="1" stop-color="#2fc9a0"/></radialGradient>
+  <radialGradient id="bgR" cx=".5" cy=".42" r=".75"><stop offset="0" stop-color="#17465a"/><stop offset=".6" stop-color="#0c2433"/><stop offset="1" stop-color="#06121c"/></radialGradient>
+</defs>`;
+
+// Glühbirne mit Roboter-Gesicht = Logo
+function bulb(x, y, s) {
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <circle cx="0" cy="-40" r="260" fill="${MINT}" opacity=".22" filter="url(#glow)"/>
+    ${Array.from({ length: 12 }, (_, i) => { const a = i / 12 * 6.283 - 1.571; return `<line x1="${Math.cos(a) * 230}" y1="${-40 + Math.sin(a) * 230}" x2="${Math.cos(a) * 285}" y2="${-40 + Math.sin(a) * 285}" stroke="${SUN}" stroke-width="16" stroke-linecap="round" opacity="${i > 3 && i < 9 ? 0 : .9}"/>`; }).join('')}
+    <path d="M-170 -40 C -170 -150, -95 -215, 0 -215 C 95 -215, 170 -150, 170 -40 C 170 30, 120 70, 95 110 L95 150 L-95 150 L-95 110 C -120 70, -170 30, -170 -40 Z" fill="url(#bulbG)"/>
+    <path d="M-120 -90 C -110 -150, -60 -180, -10 -185" stroke="#fff" stroke-width="18" fill="none" stroke-linecap="round" opacity=".7"/>
+    <rect x="-112" y="-110" width="224" height="150" rx="44" fill="#0d1b2a"/>
+    <g filter="url(#glowS)"><ellipse cx="-44" cy="-42" rx="20" ry="28" fill="${MINT}"/><ellipse cx="44" cy="-42" rx="20" ry="28" fill="${MINT}"/>
+    <path d="M-34 6 Q 0 28 34 6" stroke="${MINT}" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+    <rect x="-100" y="150" width="200" height="34" rx="12" fill="${CORAL}"/><rect x="-92" y="190" width="184" height="30" rx="12" fill="#e0603f"/>
+    <rect x="-80" y="226" width="160" height="30" rx="12" fill="${CORAL}"/><path d="M-44 262 L44 262 L22 296 L-22 296 Z" fill="#2b3654"/></g>`;
+}
+
+function avatar() {
+  const S = 800;
+  let s = `<rect width="${S}" height="${S}" fill="url(#bgR)"/>`;
+  for (let x = 0; x <= S; x += 50) s += `<line x1="${x}" y1="0" x2="${x}" y2="${S}" stroke="${MINT}" stroke-opacity=".06" stroke-width="2"/><line x1="0" y1="${x}" x2="${S}" y2="${x}" stroke="${MINT}" stroke-opacity=".06" stroke-width="2"/>`;
+  s += bulb(400, 410, 1.12);
+  return s;
+}
+
+function banner() {
+  const BW = 2560, BH = 1440, cy = 720;
+  let s = `<rect width="${BW}" height="${BH}" fill="#06121c"/><rect width="${BW}" height="${BH}" fill="url(#bgR)"/>`;
+  for (let x = 0; x <= BW; x += 80) s += `<line x1="${x}" y1="0" x2="${x}" y2="${BH}" stroke="${MINT}" stroke-opacity=".05" stroke-width="2"/>`;
+  for (let y = 0; y <= BH; y += 80) s += `<line x1="0" y1="${y}" x2="${BW}" y2="${y}" stroke="${MINT}" stroke-opacity=".05" stroke-width="2"/>`;
+  // Staub
+  const R = rng(4);
+  for (let i = 0; i < 70; i++) s += `<circle cx="${R() * BW}" cy="${R() * BH}" r="${2 + R() * 5}" fill="#fff3dd" opacity="${.1 + R() * .3}" filter="url(#soft)"/>`;
+  // links: Bauplan-Linien + Figuren
+  s += `<g opacity=".3" stroke="#9ec9ff" stroke-width="4" fill="none"><path d="M40 640 L40 560 C 40 520, 70 500, 120 500 L300 500 C 390 500, 450 530, 480 580 L510 640 Z"/><path d="M40 640 L510 640 L510 660 L40 660 Z"/><path d="M60 660 L60 760 M490 660 L490 760"/></g>`;
+  s += person({ x: 190, neck: 690, s: .62, hair: 'mom', hairCol: '#8a5a3c', skin: '#f6d1b0', shirt: '#3fae7a', look: [10, 0], mouth: 'smile', hL: [150, 815], hR: [232, 815] });
+  s += person({ x: 330, neck: 720, s: .5, hair: 'lily', hairCol: '#c0642e', skin: '#f8d8bc', shirt: SUN, look: [10, -3], mouth: 'o', hL: [300, 820], hR: [360, 820] });
+  s += `<g transform="translate(470 650) scale(.36)">${fly(0, 0, 1, .3)}</g>`;
+  // rechts: Roboter und Patentblatt mit Stempel
+  s += robot({ x: 2180, neck: 700, s: .56, t: 1, eyes: 'happy', hL: [2135, 815], hR: [2250, 610] });
+  s += `<g transform="translate(2420 690) rotate(6) scale(.5)"><rect x="-150" y="-190" width="300" height="380" rx="10" fill="#f4efe6"/>${Array.from({ length: 6 }, (_, i) => `<rect x="-110" y="${-150 + i * 40}" width="${220 - (i % 2) * 60}" height="12" rx="6" fill="#c9c2b6"/>`).join('')}</g>`;
+  s += stamp('PENDING', 2420, 710, 1, CORAL, -14, 40);
+  // Mitte (sicherer Bereich 1546x423)
+  s += bulb(720, cy - 10, .6);
+  s += `<g>${text('PATENT FUTURE', 900, cy - 50, { size: 128, anchor: 'start', fill: '#ffffff', glow: MINT, ls: 3 })}
+    ${text('Inventions that don\u2019t exist yet. Explained.', 906, cy + 55, { size: 48, weight: 800, anchor: 'start', fill: MINT })}
+    <rect x="906" y="${cy + 105}" width="560" height="56" rx="28" fill="none" stroke="${CORAL}" stroke-width="4"/>
+    ${text('SUBSCRIBE FOR THE NEXT FILE', 1186, cy + 134, { size: 26, font: 'JetBrains Mono', weight: 800, fill: CORAL, ls: 2 })}</g>`;
+  return s;
+}
+function fly(x, y, s, t) {
+  return `<g transform="translate(${x} ${y}) scale(${s})">
+    <ellipse cx="-60" cy="-70" rx="130" ry="55" fill="#dff6ff" opacity=".55" transform="rotate(-25 -60 -70)"/><ellipse cx="60" cy="-70" rx="130" ry="55" fill="#dff6ff" opacity=".55" transform="rotate(25 60 -70)"/>
+    <ellipse cx="0" cy="70" rx="56" ry="110" fill="#c8913a"/>${[0, 1, 2].map(i => `<rect x="-52" y="${60 + i * 36}" width="104" height="14" rx="7" fill="#7a4e1e"/>`).join('')}
+    <ellipse cx="0" cy="-20" rx="62" ry="58" fill="#b07a2e"/><circle cx="0" cy="-100" r="62" fill="#c8913a"/>
+    <ellipse cx="-42" cy="-108" rx="34" ry="40" fill="#d9302b"/><ellipse cx="42" cy="-108" rx="34" ry="40" fill="#d9302b"/></g>`;
+}
+
+const svg = document.getElementById('stage');
+const [w, h] = mode === 'avatar' ? [800, 800] : [2560, 1440];
+svg.setAttribute('viewBox', `0 0 ${w} ${h}`); svg.setAttribute('width', w); svg.setAttribute('height', h);
+svg.innerHTML = DEFS + (mode === 'avatar' ? avatar() : banner());
+</script>
+</body>
+</html>
