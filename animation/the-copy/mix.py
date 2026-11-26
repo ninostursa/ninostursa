@@ -1,0 +1,155 @@
+"""Mischt Erzählstimme + synthetische Musik + Soundeffekte zu mix.wav (-14 LUFS).
+Liest timeline.json, sfx.json (von render.js aus der Szene exportiert) und audio/*.mp3."""
+import json, subprocess, pathlib
+import numpy as np
+
+HERE = pathlib.Path(__file__).parent
+SR = 44100
+TL = json.loads((HERE / "timeline.json").read_text())
+SFX = json.loads((HERE / "sfx.json").read_text())
+DUR = TL["duration"]
+N = int(DUR * SR) + SR
+rng = np.random.default_rng(7)
+
+
+def load(p):
+    raw = subprocess.check_output(["ffmpeg", "-v", "error", "-i", str(p), "-f", "f32le", "-ac", "1", "-ar", str(SR), "-"])
+    return np.frombuffer(raw, dtype=np.float32).copy()
+
+
+def lowpass(x, a):            # einpoliger Tiefpass, a in (0,1): kleiner = dunkler
+    y = np.empty_like(x); acc = 0.0
+    for i in range(len(x)):
+        acc += a * (x[i] - acc); y[i] = acc
+    return y
+
+
+def env(n, attack=.005, decay=None):
+    t = np.arange(n) / SR
+    e = np.minimum(1, t / max(attack, 1e-4))
+    if decay: e *= np.exp(-t / decay)
+    return e
+
+
+def tone(f0, dur, f1=None, decay=.2, wave="sine"):
+    n = int(dur * SR); t = np.arange(n) / SR
+    f = f0 if f1 is None else f0 * (f1 / f0) ** (t / dur)
+    ph = 2 * np.pi * np.cumsum(np.broadcast_to(f, (n,))) / SR
+    s = np.sin(ph) if wave == "sine" else np.sign(np.sin(ph)) * .5
+    return s * env(n, .003, decay)
+
+
+def noise(dur):
+    return rng.uniform(-1, 1, int(dur * SR))
+
+
+def sfx(kind):
+    if kind == "whoosh":
+        n = noise(.5); sweep = np.sin(np.linspace(0, np.pi, len(n))) ** 2
+        return lowpass(n, .25) * sweep * .5
+    if kind == "swish":
+        n = noise(.3); return (n - lowpass(n, .3)) * np.sin(np.linspace(0, np.pi, len(n))) * .25
+    if kind == "pop": return tone(500, .12, 900, .04) * .35
+    if kind == "blip": return tone(1250, .08, None, .03) * .18
+    if kind == "tick2": return tone(1000, .15, None, .05) * .25 + tone(1500, .15, None, .04) * .15
+    if kind == "chime_low": return (tone(392, 1.6, None, .6) + .6 * tone(587, 1.6, None, .5) + .3 * tone(784, 1.6, None, .4)) * .2
+    if kind == "power": return (tone(880, 2, None, .8) + .6 * tone(1318, 2, None, .7) + .4 * tone(1760, 2, None, .6) + tone(110, 2, 55, .5)) * .2
+    if kind == "glug":
+        n = lowpass(noise(1.1), .05); am = .5 + .5 * np.sin(2 * np.pi * 9 * np.arange(len(n)) / SR); return n * am * 2.2
+    if kind == "gulp":
+        n = lowpass(noise(.9), .04); am = .5 + .5 * np.sin(2 * np.pi * 4 * np.arange(len(n)) / SR); return n * am * 2.4
+    if kind == "hiss":
+        n = noise(1.2); return (n - lowpass(n, .4)) * env(len(n), .01, .35) * .25
+    if kind == "boom":
+        return tone(80, 1.6, 35, .5) * .7 + lowpass(noise(1.6), .03) * env(int(1.6 * SR), .005, .3) * 1.5
+    if kind == "glitch":
+        n = noise(.45); gate = (np.floor(np.arange(len(n)) / (SR * .03)) % 2); return np.round(n * 4) / 4 * gate * .12
+    if kind == "tick":
+        out = np.zeros(int(2.2 * SR))
+        for k in range(22): i = int(k * .1 * SR); c = tone(2200, .03, None, .006) * .25; out[i:i + len(c)] += c
+        return out
+    if kind == "count":
+        out = np.zeros(int(1.6 * SR))
+        for k in range(24): i = int(k * 1.5 / 24 * SR); c = tone(900 + k * 40, .03, None, .008) * .14; out[i:i + len(c)] += c
+        return out
+    if kind == "scan": return tone(200, 3.5, 900, 3) * np.sin(np.linspace(0, np.pi, int(3.5 * SR))) * .08
+    if kind == "stamp": return tone(90, .35, 50, .09) * .9 + lowpass(noise(.35), .2) * env(int(.35 * SR), .001, .04) * .8
+    if kind == "warn": return np.concatenate([tone(740, .14, None, .2), tone(520, .2, None, .2)]) * .16
+    if kind == "jingle":
+        out = np.zeros(int(1.2 * SR))
+        for k, f in enumerate([523, 659, 784, 1046]): c = tone(f, .5, None, .2) * .2; i = int(k * .13 * SR); out[i:i + len(c)] += c
+        return out
+    if kind == "lapse":
+        n = noise(7); sw = np.linspace(0, 1, len(n)) ** 2 * np.minimum(1, (len(n) - np.arange(len(n))) / (SR * .4))
+        return (n - lowpass(n, .2)) * sw * .18
+    if kind == "click": return tone(1800, .05, None, .01) * .3
+    return np.zeros(1)
+
+
+# ---------- Erzählung ----------
+voice = np.zeros(N, np.float32)
+active = np.zeros(N, np.float32)
+for c in TL["clips"]:
+    x = load(HERE / "audio" / f"{c['id']}.mp3")
+    rms = np.sqrt(np.mean(x[np.abs(x) > .01] ** 2)) + 1e-6
+    x = x * (.12 / rms)
+    i = int(c["start"] * SR); voice[i:i + len(x)] += x[:N - i]
+    active[i:i + len(x)] = 1
+
+# ---------- Musik ----------
+t = np.arange(N) / SR
+CH = {"Am": [110, 130.81, 164.81], "F": [87.31, 110, 130.81], "C": [130.81, 164.81, 196], "G": [98, 123.47, 146.83], "Dm": [146.83, 174.61, 220], "E": [82.41, 103.83, 123.47]}
+S = {c["id"]: c["start"] for c in TL["clips"]}
+E = {c["id"]: c["end"] for c in TL["clips"]}
+warm = ["Am", "F", "C", "G"]
+tense = ["Am", "Am", "F", "E"]
+bar = 4.8
+music = np.zeros(N, np.float32)
+idx = (t // bar).astype(int)
+for k in range(idx.max() + 1):
+    a, b = int(k * bar * SR), min(N, int((k + 1) * bar * SR + .4 * SR))
+    tt = t[a:b]
+    mid = k * bar
+    seq = tense if S["s09"] - 2 < mid < E["s21"] else warm
+    notes = CH[seq[k % 4]]
+    e = np.minimum(1, (tt - k * bar) / .6) * np.minimum(1, np.maximum(0, (k + 1) * bar + .4 - tt) / .6)
+    seg = sum(np.sin(2 * np.pi * f * tt) + .25 * np.sin(2 * np.pi * 2 * f * tt + .5) + .12 * np.sin(2 * np.pi * 1.005 * f * tt) for f in notes)
+    music[a:b] += (seg * e * .05).astype(np.float32)
+    # Arpeggio (gezupft)
+    step = bar / 16
+    for j in range(16):
+        f = notes[j % 3] * (4 if j % 4 == 3 else 2)
+        p = tone(f, .6, None, .22) * .05
+        i = int((k * bar + j * step) * SR); music[i:i + len(p)] += p[:max(0, N - i)]
+# Puls in den Erklärkapiteln (Spannung)
+beat = 60 / 100
+pt = S["s09"] - 1
+while pt < E["s21"]:
+    k = tone(70, .35, 40, .12) * .35
+    i = int(pt * SR); music[i:i + len(k)] += k
+    pt += beat
+# Ducking: Musik leiser, wenn gesprochen wird
+duck = lowpass(active, 1 / (SR * .25)) if False else None
+win = int(SR * .3)
+kern = np.ones(win) / win
+act_s = np.convolve(active, kern, mode="same")
+gain = 1 - .62 * np.clip(act_s, 0, 1)
+music *= gain.astype(np.float32)
+music *= np.minimum(1, t / 2) * np.minimum(1, np.maximum(0, DUR - t) / 2)
+
+# ---------- Effekte ----------
+fx = np.zeros(N, np.float32)
+for at, kind in SFX:
+    x = sfx(kind).astype(np.float32)
+    i = max(0, int(at * SR)); fx[i:i + len(x)] += x[:max(0, N - i)]
+
+mix = voice + music * .9 + fx * .8
+mix = mix[:int(DUR * SR)]
+raw = HERE / "mix_raw.wav"
+pcm = (np.clip(mix / max(1, np.abs(mix).max()), -1, 1) * 32767).astype(np.int16)
+import wave
+with wave.open(str(raw), "wb") as w:
+    w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes(pcm.tobytes())
+subprocess.check_call(["ffmpeg", "-v", "error", "-y", "-i", str(raw), "-af", "loudnorm=I=-14:TP=-1.5:LRA=11", "-ar", "48000", "-ac", "2", str(HERE / "mix.wav")])
+raw.unlink()
+print("mix.wav fertig")
