@@ -1,0 +1,303 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  svg { display: block; width: 540px; height: 960px; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+/*
+ * Szene 01 – Raketenstart (Stil: flache 2D-Vektorgrafik, Strichmännchen)
+ * Alles ist eine Funktion der Zeit t (Sekunden) → jedes Bild ist reproduzierbar.
+ * render(t) zeichnet genau ein Bild. render.js ruft das 30x pro Sekunde auf.
+ */
+const W = 1080, H = 1920;
+const DURATION = 12;
+const GROUND_Y = 1240;          // Horizont / Boden
+const PAD_X = 770;              // Raketenmitte
+const PAD_Y = 1236;             // Unterkante Rakete
+
+// ---------- Helfer ----------
+const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, k) => a + (b - a) * k;
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const easeInOut = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const easeOutBack = k => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+const easeIn = k => k * k * k;
+function hex2rgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+function mix(c1, c2, k) {
+  const a = hex2rgb(c1), b = hex2rgb(c2);
+  return `rgb(${a.map((v, i) => Math.round(lerp(v, b[i], k))).join(',')})`;
+}
+// deterministischer Zufall
+function rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+const noise = (t, f, seed) => Math.sin(t * f + seed) * .6 + Math.sin(t * f * 2.3 + seed * 1.7) * .4;
+
+// vorberechnete Zufallsdaten
+const R = rng(42);
+const DUST = Array.from({ length: 46 }, () => ({ x: R() * W, y: 300 + R() * 1500, r: 2 + R() * 5, sp: 8 + R() * 22, ph: R() * 6.28 }));
+const STARS = Array.from({ length: 110 }, () => ({ x: R() * W, y: R() * 1150, r: .8 + R() * 2.4, ph: R() * 6.28 }));
+const SMOKE_PAD = Array.from({ length: 70 }, (_, i) => ({ ts: 3.1 + i * 0.06 + R() * .05, dir: R() < .5 ? -1 : 1, sp: 160 + R() * 260, rise: 20 + R() * 90, r0: 30 + R() * 30, shade: R() }));
+const SMOKE_TRAIL = Array.from({ length: 70 }, (_, i) => ({ ts: 4.1 + i * 0.055, dx: (R() - .5) * 40, r0: 26 + R() * 18, shade: R() }));
+
+// ---------- Zeitachse ----------
+function rocketLift(t) {                 // Höhe der Rakete über dem Boden
+  const k = Math.max(0, t - 4.0);
+  return 0.5 * 260 * k * k + 10 * k;
+}
+function nightFactor(t) { return easeInOut(prog(t, 7.6, 10.2)); }
+function yearAt(t) {
+  const k = prog(t, 7.8, 11.3);
+  return Math.round(lerp(2032, 2256, easeIn(k)));
+}
+
+// ---------- Bausteine ----------
+function sky(n) {
+  const top = mix('#2b2550', '#070a1f', n), mid = mix('#6e4d84', '#151a40', n),
+        low = mix('#d27c86', '#2c2a5c', n), hor = mix('#f6b066', '#463a6e', n);
+  return `
+  <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${GROUND_Y + 40}">
+    <stop offset="0" stop-color="${top}"/><stop offset=".38" stop-color="${mid}"/>
+    <stop offset=".54" stop-color="${low}"/><stop offset=".65" stop-color="${hor}"/>
+  </linearGradient>
+  <rect y="-500" width="${W}" height="${GROUND_Y + 540}" fill="url(#sky)"/>`;
+}
+
+function stars(t, n) {
+  if (n <= 0) return '';
+  return STARS.map(s => `<circle cx="${s.x}" cy="${s.y}" r="${s.r}" fill="#fff" opacity="${(n * (.45 + .55 * Math.sin(t * 2.2 + s.ph) ** 2)).toFixed(3)}"/>`).join('');
+}
+
+function sun(t, n) {
+  const cx = 300, cy = 1080 + n * 260;
+  let rays = '';
+  for (let i = 0; i < 26; i++) {
+    const a = i / 26 * Math.PI * 2 + t * 0.05;
+    const w = 0.035 + (i % 3) * 0.012, L = 1400;
+    const p1 = [cx + Math.cos(a - w) * L, cy + Math.sin(a - w) * L];
+    const p2 = [cx + Math.cos(a + w) * L, cy + Math.sin(a + w) * L];
+    rays += `<polygon points="${cx},${cy} ${p1} ${p2}" fill="#fff3d6" opacity="${(0.07 + (i % 2) * 0.04) * (1 - n)}"/>`;
+  }
+  return `
+  <radialGradient id="sunGlow"><stop offset="0" stop-color="#fffbea"/><stop offset=".18" stop-color="#fff1c8" stop-opacity=".95"/>
+    <stop offset=".45" stop-color="#ffc98a" stop-opacity=".35"/><stop offset="1" stop-color="#ff9a6a" stop-opacity="0"/></radialGradient>
+  <g opacity="${1 - n * .95}">${rays}<circle cx="${cx}" cy="${cy}" r="${430 + Math.sin(t * 1.3) * 10}" fill="url(#sunGlow)"/></g>`;
+}
+
+function hills(n) {
+  return `<path d="M0 1170 C 180 1130 340 1150 520 1165 S 860 1120 1080 1150 L1080 ${GROUND_Y + 10} L0 ${GROUND_Y + 10} Z" fill="${mix('#3d2d55', '#141633', n)}"/>`;
+}
+
+function ground(n) {
+  let lines = '';
+  for (let i = 0; i < 14; i++) {
+    const y = GROUND_Y + 12 + Math.pow(i, 1.6) * 14;
+    lines += `<rect x="0" y="${y}" width="${W}" height="2" fill="#fff" opacity="${0.035 - i * 0.002}"/>`;
+  }
+  return `
+  <linearGradient id="gnd" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="${mix('#4a3a55', '#1b1a33', n)}"/><stop offset="1" stop-color="${mix('#1a1422', '#07070f', n)}"/></linearGradient>
+  <rect x="0" y="${GROUND_Y}" width="${W}" height="${H - GROUND_Y}" fill="url(#gnd)"/>${lines}
+  <rect x="560" y="${GROUND_Y - 4}" width="470" height="26" rx="6" fill="${mix('#2a2030', '#0e0e1c', n)}"/>`;
+}
+
+function floodlight(t, n) {
+  const flick = 1 - n * .2;
+  return `
+  <linearGradient id="cone" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff7e6" stop-opacity=".55"/><stop offset="1" stop-color="#fff7e6" stop-opacity="0"/></linearGradient>
+  <polygon points="70,780 120,780 470,1240 -60,1240" fill="url(#cone)" opacity="${.55 * flick}"/>
+  <rect x="88" y="782" width="8" height="${GROUND_Y - 782}" fill="#1b1624"/>
+  <rect x="58" y="766" width="68" height="22" rx="4" fill="#f4f1ea"/>
+  <circle cx="92" cy="777" r="70" fill="#fff8e8" opacity="${.18 * flick}"/>`;
+}
+
+function tower(t, n) {
+  const x0 = 905, x1 = 985, top = 470, bot = GROUND_Y;
+  const c = mix('#1d1726', '#0b0b17', n);
+  let s = `<g stroke="${c}" stroke-width="8" fill="none" stroke-linecap="round">
+    <line x1="${x0}" y1="${top}" x2="${x0}" y2="${bot}"/><line x1="${x1}" y1="${top}" x2="${x1}" y2="${bot}"/>`;
+  const seg = 58;
+  for (let y = top; y < bot - 1; y += seg) {
+    const y2 = Math.min(y + seg, bot);
+    s += `<line x1="${x0}" y1="${y}" x2="${x1}" y2="${y2}" stroke-width="5"/><line x1="${x1}" y1="${y}" x2="${x0}" y2="${y2}" stroke-width="5"/><line x1="${x0}" y1="${y}" x2="${x1}" y2="${y}" stroke-width="5"/>`;
+  }
+  // Greifarm klappt beim Start weg
+  const armA = lerp(0, -38, easeInOut(prog(t, 2.6, 3.6)));
+  s += `</g><g transform="rotate(${armA} ${x0} 720)"><rect x="${PAD_X + 40}" y="712" width="${x0 - PAD_X - 40}" height="14" rx="5" fill="${c}"/></g>`;
+  const blink = Math.sin(t * 4) > 0 ? 1 : .25;
+  s += `<circle cx="${(x0 + x1) / 2}" cy="${top - 14}" r="9" fill="#ff6a3d" opacity="${blink}"/><circle cx="${(x0 + x1) / 2}" cy="${top - 14}" r="28" fill="#ff6a3d" opacity="${blink * .25}"/>`;
+  return s;
+}
+
+function rocket(t) {
+  const lift = rocketLift(t);
+  const shake = t > 3.2 && t < 6 ? noise(t, 70, 1) * 3 * (1 - prog(t, 5, 6)) : 0;
+  const x = PAD_X + shake, by = PAD_Y - lift;
+  const bw = 112, h = 640, top = by - h;
+  const flameOn = prog(t, 3.2, 3.8);
+  let flame = '';
+  if (flameOn > 0) {
+    const fl = (1 + noise(t, 40, 3) * .15) * flameOn;
+    const L = (110 + Math.min(lift * .25, 160)) * fl;
+    flame = `
+      <ellipse cx="${x}" cy="${by + 26 + L * .45}" rx="${46 * fl}" ry="${L * .6}" fill="#ff7a3a" opacity=".85" filter="url(#soft)"/>
+      <ellipse cx="${x}" cy="${by + 22 + L * .35}" rx="${30 * fl}" ry="${L * .45}" fill="#ffd36b"/>
+      <ellipse cx="${x}" cy="${by + 18 + L * .22}" rx="${15 * fl}" ry="${L * .28}" fill="#fffbe8"/>
+      <circle cx="${x}" cy="${by + 40}" r="${170 * fl}" fill="#ffb066" opacity="${.22 * fl}" filter="url(#soft)"/>`;
+  }
+  return `
+  <linearGradient id="hull" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#fdfcfb"/><stop offset=".55" stop-color="#e9e6ec"/><stop offset="1" stop-color="#b9b3c2"/></linearGradient>
+  <linearGradient id="win" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7fa8e8"/><stop offset="1" stop-color="#2f4f9c"/></linearGradient>
+  ${flame}
+  <g>
+    <path d="M${x - bw / 2 - 2} ${by - 150} L${x - bw / 2 - 92} ${by + 4} L${x - bw / 2 - 2} ${by - 40} Z" fill="#8c8796"/>
+    <path d="M${x + bw / 2 + 2} ${by - 150} L${x + bw / 2 + 92} ${by + 4} L${x + bw / 2 + 2} ${by - 40} Z" fill="#6f6a7a"/>
+    <rect x="${x - 34}" y="${by - 6}" width="68" height="26" rx="8" fill="#47434f"/>
+    <path d="M${x - bw / 2} ${by} L${x - bw / 2} ${top + 230}
+             C ${x - bw / 2} ${top + 120}, ${x - 22} ${top + 30}, ${x} ${top}
+             C ${x + 22} ${top + 30}, ${x + bw / 2} ${top + 120}, ${x + bw / 2} ${top + 230}
+             L${x + bw / 2} ${by} Z" fill="url(#hull)"/>
+    <path d="M${x - 26} ${top + 80} C ${x - 22} ${top + 45}, ${x - 10} ${top + 22}, ${x - 4} ${top + 14} L${x - 4} ${top + 150} L${x - 30} ${top + 165} Z" fill="url(#win)"/>
+    <rect x="${x + 16}" y="${top + 150}" width="13" height="${h - 175}" rx="3" fill="#e85a35"/>
+    ${[0, 1, 2].map(i => `<circle cx="${x - 8}" cy="${top + 290 + i * 95}" r="7" fill="#f3c34a"/><circle cx="${x - 8}" cy="${top + 290 + i * 95}" r="16" fill="#f3c34a" opacity=".25"/>`).join('')}
+  </g>`;
+}
+
+function smoke(t, n, part) {
+  let s = '';
+  const col = (sh, a) => mix(sh > .5 ? '#d9cde2' : '#b7a6c6', '#4b4a6e', n * .8);
+  if (part === 'pad') for (const p of SMOKE_PAD) {
+    const age = t - p.ts;
+    if (age <= 0) continue;
+    const k = 1 - Math.exp(-age * 1.1);
+    const x = PAD_X + p.dir * p.sp * k * 1.4;
+    const y = PAD_Y + 10 - p.rise * k - age * 6;
+    const r = p.r0 + 70 * k + age * 8;
+    const o = clamp(1 - (age - 3.5) / 4) * .95;
+    s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${col(p.shade)}" opacity="${o}"/>`;
+  }
+  if (part === 'trail') for (const p of SMOKE_TRAIL) {
+    const age = t - p.ts;
+    if (age <= 0) continue;
+    const y0 = PAD_Y - rocketLift(p.ts) + 120;
+    const r = p.r0 + 40 * (1 - Math.exp(-age)) + age * 6;
+    const o = clamp(1 - (age - 1.5) / 3.5) * .85;
+    s += `<circle cx="${PAD_X + p.dx + noise(age, 1.5, p.ts) * 12}" cy="${y0 + age * 8}" r="${r}" fill="${col(p.shade)}" opacity="${o}"/>`;
+  }
+  return s;
+}
+
+// Strichmännchen: dunkler Körper mit warmem Lichtrand (Rim-Light)
+function stickman(cx, footY, t, opt) {
+  const { coat = false, glasses = false, helmet = false, seed = 0, wave = false } = opt;
+  const bob = Math.sin(t * 2.4 + seed) * 2.5;
+  const lookUp = easeInOut(prog(t, 3.4 + seed * .08, 4.2 + seed * .08));
+  const headR = 34, hipY = footY - 120, neckY = footY - 228 + bob, headY = neckY - headR + 4;
+  const tilt = -lookUp * 9;
+  // Blinzeln
+  const bt = (t + seed * 1.3) % 3.7;
+  const eyeS = bt < .12 ? .15 : 1;
+  const eyeDy = -lookUp * 10, eyeDx = 4 + lookUp * 4;
+  const dark = '#17121d', rim = '#f2d2a4';
+  const limb = (x1, y1, x2, y2) => `<line x1="${x1 + 3}" y1="${y1}" x2="${x2 + 3}" y2="${y2}" stroke="${rim}" stroke-width="13" stroke-linecap="round"/><line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${dark}" stroke-width="13" stroke-linecap="round"/>`;
+  // Arme: Schulter → Hand; winken = Arm hoch, Hand pendelt
+  const shY = neckY + 22;
+  const wv = wave ? easeInOut(prog(t, 4.9, 5.3)) : 0;
+  const handR = [lerp(cx + 20, cx + 46 + Math.sin(t * 10) * 16, wv), lerp(hipY + 22, shY - 78, wv)];
+  let body = '';
+  body += limb(cx, hipY, cx - 20, footY) + limb(cx, hipY, cx + 18, footY);
+  body += `<ellipse cx="${cx - 24}" cy="${footY + 2}" rx="17" ry="7" fill="${dark}"/><ellipse cx="${cx + 22}" cy="${footY + 2}" rx="17" ry="7" fill="${dark}"/>`;
+  body += limb(cx, neckY + 8, cx, hipY);
+  if (coat) body += `<path d="M${cx - 22} ${neckY + 12} L${cx + 22} ${neckY + 12} L${cx + 36} ${hipY + 40} L${cx - 36} ${hipY + 40} Z" fill="#f1efe9"/><path d="M${cx + 22} ${neckY + 12} L${cx + 36} ${hipY + 40} L${cx + 24} ${hipY + 40} Z" fill="#cfcad6"/><line x1="${cx}" y1="${neckY + 16}" x2="${cx}" y2="${hipY + 38}" stroke="#cfcad6" stroke-width="3"/>`;
+  body += limb(cx, shY, cx - 22, hipY + 22);
+  body += limb(cx, shY, handR[0], handR[1]);
+  // Kopf
+  let head = `<g transform="rotate(${tilt} ${cx} ${neckY})">
+    <circle cx="${cx + 3}" cy="${headY}" r="${headR}" fill="${rim}"/>
+    <circle cx="${cx}" cy="${headY}" r="${headR}" fill="${dark}"/>
+    <g transform="translate(${cx + eyeDx} ${headY - 4 + eyeDy}) scale(1 ${eyeS})">
+      <circle cx="-9" cy="0" r="5.5" fill="#fff"/><circle cx="9" cy="0" r="5.5" fill="#fff"/></g>
+    <path d="M${cx + eyeDx - 9} ${headY + 13 + eyeDy * .5} Q ${cx + eyeDx} ${headY + 21 + eyeDy * .5} ${cx + eyeDx + 9} ${headY + 13 + eyeDy * .5}" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="${lookUp > .5 ? 0 : 1}"/>
+    <ellipse cx="${cx + eyeDx}" cy="${headY + 16 + eyeDy * .5}" rx="5" ry="${6 * lookUp}" fill="#fff" opacity="${lookUp > .5 ? 1 : 0}"/>`;
+  if (glasses) head += `<g transform="translate(${cx + eyeDx} ${headY - 4 + eyeDy})" stroke="#fff" stroke-width="3" fill="none"><circle cx="-10" cy="0" r="11"/><circle cx="10" cy="0" r="11"/><line x1="-1" y1="0" x2="1" y2="0"/></g>`;
+  if (helmet) head += `<circle cx="${cx}" cy="${headY}" r="${headR + 12}" fill="#bfe3ff" opacity=".18" stroke="#e9f5ff" stroke-width="4"/><path d="M${cx - 20} ${headY - 30} Q ${cx - 6} ${headY - 40} ${cx + 8} ${headY - 36}" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".7"/>`;
+  head += `</g>`;
+  return `<g>${body}${head}</g>`;
+}
+
+function people(t) {
+  const fy = 1520;
+  return [
+    stickman(150, fy, t, { seed: 0 }),
+    stickman(260, fy, t, { seed: 1, coat: true, glasses: true }),
+    stickman(370, fy, t, { seed: 2, wave: true }),
+    stickman(480, fy, t, { seed: 3 }),
+  ].join('') + `<ellipse cx="315" cy="1526" rx="260" ry="14" fill="#000" opacity=".25"/>`;
+}
+
+function dust(t, n) {
+  return DUST.map(d => {
+    const y = ((d.y - t * d.sp) % 1700 + 1700) % 1700 + 200;
+    const x = d.x + Math.sin(t * .6 + d.ph) * 18;
+    const o = (.25 + .35 * Math.sin(t * 1.4 + d.ph) ** 2) * (1 - n * .4);
+    return `<circle cx="${x}" cy="${y}" r="${d.r}" fill="#fff4e0" opacity="${o.toFixed(3)}" filter="url(#soft)"/>`;
+  }).join('');
+}
+
+function yearText(t) {
+  const pop = easeOutBack(prog(t, .6, 1.3));
+  if (pop <= 0) return '';
+  const y = yearAt(t);
+  const counting = t > 7.8 && t < 11.3;
+  const settle = prog(t, 11.3, 11.7);
+  const pulse = counting ? 1 + Math.sin(t * 30) * .015 : 1 + (1 - settle) * .12 * (t > 11.3 ? 1 : 0);
+  const s = pop * pulse;
+  return `
+  <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dc8e"/><stop offset=".55" stop-color="#d9ad55"/><stop offset="1" stop-color="#b8863a"/></linearGradient>
+  <g transform="translate(540 390) scale(${s})">
+    <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" font-family="Inter" font-weight="900" font-size="230" fill="#ffcf6a" opacity=".55" filter="url(#glow)">${y}</text>
+    <text x="0" y="0" text-anchor="middle" dominant-baseline="middle" font-family="Inter" font-weight="900" font-size="230" fill="url(#gold)" letter-spacing="4">${y}</text>
+  </g>`;
+}
+
+function render(t) {
+  const n = nightFactor(t);
+  // Kamera: langsamer Push-In, Wackeln beim Start, leichter Tilt nach oben
+  const push = lerp(1.0, 1.07, easeInOut(prog(t, 0, 7.5)));
+  const shakeK = t > 3.3 && t < 6.5 ? (1 - prog(t, 5.2, 6.5)) * prog(t, 3.3, 4) : 0;
+  const sx = noise(t, 55, 7) * 7 * shakeK, sy = noise(t, 61, 9) * 7 * shakeK;
+  const tiltUp = easeInOut(prog(t, 4.2, 7.5)) * 110;
+  const cam = `translate(${540 + sx} ${1100 + sy + tiltUp}) scale(${push}) translate(-540 -1100)`;
+  const fadeIn = 1 - prog(t, 0, .7);
+  const fadeOut = prog(t, 11.6, 12);
+
+  document.getElementById('stage').innerHTML = `
+  <defs>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="glow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="22"/></filter>
+    <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+  </defs>
+  <g transform="${cam}">
+    ${sky(n)}${stars(t, n)}${sun(t, n)}${hills(n)}
+    ${floodlight(t, n)}${ground(n)}${tower(t, n)}
+    ${smoke(t, n, 'trail')}${rocket(t)}${smoke(t, n, 'pad')}
+    ${people(t)}
+  </g>
+  ${dust(t, n)}
+  ${yearText(t)}
+  <rect width="${W}" height="${H}" fill="url(#vig)"/>
+  <rect width="${W}" height="${H}" fill="#000" opacity="${Math.max(fadeIn, fadeOut)}"/>`;
+}
+
+window.render = render;
+window.DURATION = DURATION;
+render(parseFloat(new URLSearchParams(location.search).get('t') || '2'));
+</script>
+</body>
+</html>
