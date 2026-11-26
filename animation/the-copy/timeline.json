@@ -1,5 +1,5 @@
 {
- "duration": 202.15,
+ "duration": 202.18,
  "clips": [
   {
    "id": "s01",
@@ -26,175 +26,175 @@
    "id": "s04",
    "voice": "N",
    "start": 22.44,
-   "end": 26.15,
-   "text": "This is Patent 2080. <break time=\"0.5s\" /> File number nine. <break time=\"0.4s\" /> The Copy."
+   "end": 26.333,
+   "text": "This is Filed Under Future. <break time=\"0.5s\" /> File number one. <break time=\"0.4s\" /> The Copy."
   },
   {
    "id": "s05",
    "voice": "N",
-   "start": 27.05,
-   "end": 38.7,
+   "start": 27.233,
+   "end": 38.883,
    "text": "Science fiction? It has already begun. A Canadian man named Joshua Barbeau gave an AI the old text messages of his fianc\u00e9e, eight years after she died. <break time=\"0.3s\" /> Then he talked to her. For hours."
   },
   {
    "id": "s06",
    "voice": "N",
-   "start": 39.0,
-   "end": 46.889,
+   "start": 39.183,
+   "end": 47.072,
    "text": "In 2022, Marina Smith, eighty-seven, answered questions at her own funeral. On a screen. From interviews she recorded before she died."
   },
   {
    "id": "s07",
    "voice": "N",
-   "start": 47.189,
-   "end": 54.713,
+   "start": 47.372,
+   "end": 54.896,
    "text": "And in South Korea, a TV show let a mother meet her little daughter again. In virtual reality. Years after the girl had died."
   },
   {
    "id": "s08",
    "voice": "N",
-   "start": 55.013,
-   "end": 64.626,
+   "start": 55.196,
+   "end": 64.809,
    "text": "But here is the catch. These are echoes. They copy what a person said, not how a person thinks. To really bring Dad back, you would need much more. <break time=\"0.4s\" /> His brain."
   },
   {
    "id": "s09",
    "voice": "N",
-   "start": 65.426,
-   "end": 76.188,
+   "start": 65.609,
+   "end": 76.371,
    "text": "In 2024, scientists finished the first complete wiring map of an adult fruit fly brain. About a hundred and forty thousand nerve cells. Over fifty million connections. It took years."
   },
   {
    "id": "s10",
    "voice": "N",
-   "start": 76.488,
-   "end": 82.418,
+   "start": 76.671,
+   "end": 82.601,
    "text": "Your brain? About eighty-six billion nerve cells. More than six hundred thousand fruit fly brains. <break time=\"0.3s\" /> In one head."
   },
   {
    "id": "s11",
    "voice": "N",
-   "start": 82.718,
-   "end": 88.596,
+   "start": 82.901,
+   "end": 88.778,
    "text": "And a map is not a mind. It is like owning the blueprint of a piano, and never hearing it play."
   },
   {
    "id": "s12",
    "voice": "N",
-   "start": 89.396,
-   "end": 97.467,
+   "start": 89.578,
+   "end": 97.65,
    "text": "But let us pretend it works. 2080. Dad sits down in a scanner. It reads his brain, connection by connection, and starts it again inside a machine."
   },
   {
    "id": "s13",
    "voice": "N",
-   "start": 97.767,
-   "end": 101.007,
+   "start": 97.95,
+   "end": 101.189,
    "text": "Upload complete. <break time=\"0.5s\" /> The machine opens its eyes and says:"
   },
   {
    "id": "s13r",
    "voice": "R",
-   "start": 101.307,
-   "end": 103.579,
+   "start": 101.489,
+   "end": 103.762,
    "text": "Hi. Did I miss anything?"
   },
   {
    "id": "s14",
    "voice": "N",
-   "start": 104.379,
-   "end": 112.138,
+   "start": 104.562,
+   "end": 112.32,
    "text": "So, is it really him? Test one: memory. His wedding. His passwords. Every song he was ever embarrassed about. <break time=\"0.3s\" /> Pass."
   },
   {
    "id": "s15",
    "voice": "N",
-   "start": 112.438,
-   "end": 120.379,
+   "start": 112.62,
+   "end": 120.562,
    "text": "Test two: change. Real people learn, forget, and change their minds. A copy that never changes is just a photo that talks."
   },
   {
    "id": "s16",
    "voice": "N",
-   "start": 120.679,
-   "end": 127.627,
+   "start": 120.862,
+   "end": 127.81,
    "text": "Test three, the nasty one. What if the copy wakes up while Dad is still alive? <break time=\"0.4s\" /> Two Dads. Both sure they are the real one."
   },
   {
    "id": "s17",
    "voice": "N",
-   "start": 127.927,
-   "end": 134.223,
+   "start": 128.11,
+   "end": 134.406,
    "text": "Who gets the car keys? The last slice of pizza? Philosophers have argued about this for centuries. <break time=\"0.3s\" /> Nobody has won."
   },
   {
    "id": "s18",
    "voice": "N",
-   "start": 135.023,
-   "end": 145.602,
+   "start": 135.206,
+   "end": 145.785,
    "text": "And then, there is money. In 2024, researchers at Cambridge warned that grief bots could be used to sell you things, confuse children, or haunt people who never wanted them."
   },
   {
    "id": "s19r",
    "voice": "R",
-   "start": 145.902,
-   "end": 152.067,
+   "start": 146.085,
+   "end": 152.25,
    "text": "Speaking of dinner. Have you tried new Crunchy Bits? Now with extra crunch!"
   },
   {
    "id": "s20",
    "voice": "N",
-   "start": 152.367,
-   "end": 159.002,
+   "start": 152.55,
+   "end": 159.185,
    "text": "So they want clear rules. Always know when you are talking to a machine. A way to switch it off. Even a digital funeral."
   },
   {
    "id": "s21",
    "voice": "N",
-   "start": 159.802,
-   "end": 171.27,
+   "start": 159.985,
+   "end": 171.453,
    "text": "Our verdict. Echoes are already here, and they get more real every year. A true copy of a mind? The hardest machine in this series. We would not bet on it this century. That is our own estimate."
   },
   {
    "id": "s22",
    "voice": "N",
-   "start": 171.77,
-   "end": 179.241,
+   "start": 171.953,
+   "end": 179.424,
    "text": "And if it ever works: a copy never gets old. The kids grow up. Their kids arrive. And Dad is still at the table. <break time=\"0.3s\" /> Still drinking oil."
   },
   {
    "id": "s23",
    "voice": "N",
-   "start": 179.741,
-   "end": 183.085,
+   "start": 179.924,
+   "end": 183.268,
    "text": "Which brings us back to the question this family never dared to ask."
   },
   {
    "id": "s24",
    "voice": "K",
-   "start": 183.485,
-   "end": 185.81,
+   "start": 183.668,
+   "end": 185.993,
    "text": "Dad? <break time=\"0.5s\" /> Are you still you?"
   },
   {
    "id": "s25",
    "voice": "R",
-   "start": 186.31,
-   "end": 190.489,
+   "start": 186.493,
+   "end": 190.672,
    "text": "I think so. <break time=\"0.7s\" /> But I would say that, wouldn't I?"
   },
   {
    "id": "s26",
    "voice": "N",
-   "start": 191.289,
-   "end": 195.887,
-   "text": "Patent status: pending. <break time=\"0.5s\" /> Would you sit at this table? Tell us in the comments."
+   "start": 191.472,
+   "end": 195.913,
+   "text": "File status: pending. <break time=\"0.5s\" /> Would you sit at this table? Tell us in the comments."
   },
   {
    "id": "s27",
    "voice": "N",
-   "start": 196.287,
-   "end": 200.649,
+   "start": 196.313,
+   "end": 200.676,
    "text": "Next time: a chip that could read your thoughts. Subscribe, so you do not miss it."
   }
  ],

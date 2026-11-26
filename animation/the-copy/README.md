@@ -1,4 +1,4 @@
-# Patent 2080 · File 009 · The Copy (Neuauflage im 2D-Stil)
+# Filed Under Future · File 001 · The Copy
 
 Erklärvideo 1920×1080, 30 fps, **3:22**, englische Erzählung mit den ElevenLabs-Stimmen des Wissenskanals.
 
@@ -9,7 +9,7 @@ Erklärvideo 1920×1080, 30 fps, **3:22**, englische Erzählung mit den ElevenLa
 - **Versprechen an den Zuschauer:** „Am Ende des Videos entscheidest du, ob du an diesem Tisch sitzen würdest.“
 - **Kapitel mit Fakten,** jede Szene mit eigenem Bild-Gag: Chat, Beerdigung, VR, Fliegenhirn, Klavier-Blaupause, Labor, drei Tests, Werbe-Unterbrechung des Roboters, Regeln, Urteil, Zeitraffer.
 - **Auflösung:** Lily fragt „Dad? Are you still you?“, der Roboter antwortet „I think so. But I would say that, wouldn't I?“ und zwinkert.
-- **Schluss wie im Kanal:** „Patent status: pending“, Kommentar-Frage und Vorschau auf das nächste File (Gedankenchip).
+- **Schluss:** „File status: pending“, Kommentar-Frage und Vorschau auf das nächste File (Gedankenchip).
 
 ## Stimmen
 

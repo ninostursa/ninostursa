@@ -1,4 +1,4 @@
-"""Erzähltext für "Patent 2080 – File 009: The Copy" (Neuauflage im 2D-Stil).
+"""Erzähltext für "Filed Under Future – File 001: The Copy".
 
 Stimmen (ElevenLabs):
   N = Erzähler  – Jarnathan (gleiche Stimme wie im Wissenskanal)
@@ -28,7 +28,7 @@ LINES = [
     ("s01", "N", "Sunday dinner at the Millers. Spaghetti, as always." + b(.4) + "And this is Dad." + b(.6) + "Dad died three years ago.", .3),
     ("s02", "N", "But he still comes to dinner. Every Sunday. Same terrible jokes." + b(.3) + "He just drinks motor oil now.", .3),
     ("s03", "N", "By the end of this video, you will decide if you would sit at this table. And there is one question this family never dared to ask him." + b(.3) + "We will get to it.", .5),
-    ("s04", "N", "This is Patent 2080." + b(.5) + "File number nine." + b(.4) + "The Copy.", .9),
+    ("s04", "N", "This is Filed Under Future." + b(.5) + "File number one." + b(.4) + "The Copy.", .9),
     ("s05", "N", "Science fiction? It has already begun. A Canadian man named Joshua Barbeau gave an AI the old text messages of his fiancée, eight years after she died." + b(.3) + "Then he talked to her. For hours.", .3),
     ("s06", "N", "In 2022, Marina Smith, eighty-seven, answered questions at her own funeral. On a screen. From interviews she recorded before she died.", .3),
     ("s07", "N", "And in South Korea, a TV show let a mother meet her little daughter again. In virtual reality. Years after the girl had died.", .3),
@@ -51,7 +51,7 @@ LINES = [
     ("s23", "N", "Which brings us back to the question this family never dared to ask.", .4),
     ("s24", "K", "Dad?" + b(.5) + "Are you still you?", .5),
     ("s25", "R", "I think so." + b(.7) + "But I would say that, wouldn't I?", .8),
-    ("s26", "N", "Patent status: pending." + b(.5) + "Would you sit at this table? Tell us in the comments.", .4),
+    ("s26", "N", "File status: pending." + b(.5) + "Would you sit at this table? Tell us in the comments.", .4),
     ("s27", "N", "Next time: a chip that could read your thoughts. Subscribe, so you do not miss it.", 1.5),
 ]
 
