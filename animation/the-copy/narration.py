@@ -61,6 +61,21 @@ CHAPTERS = {"s01": "Sunday dinner", "s05": "Echoes, today", "s09": "Copying a br
 LEAD_IN = 1.2
 
 
+def api_key():
+    """Schlüssel aus Umgebungsvariable oder .env (Ordner oder Elternordner).
+    In der Cloud setzt der Proxy den Schlüssel selbst ein, dann reicht ein Platzhalter."""
+    import os
+    if os.environ.get("ELEVENLABS_API_KEY"):
+        return os.environ["ELEVENLABS_API_KEY"]
+    for d in [HERE, *HERE.parents]:
+        f = d / ".env"
+        if f.exists():
+            for line in f.read_text(encoding="utf-8").splitlines():
+                if line.strip().startswith("ELEVENLABS_API_KEY="):
+                    return line.split("=", 1)[1].strip().strip('"')
+    return "proxy-injected"
+
+
 def tts(cid, voice, text):
     out = AUDIO / f"{cid}.mp3"
     if out.exists() and "--force" not in sys.argv and cid not in sys.argv:
@@ -68,7 +83,7 @@ def tts(cid, voice, text):
     vid, settings = VOICES[voice]
     body = json.dumps({"text": text, "model_id": "eleven_multilingual_v2", "voice_settings": settings}).encode()
     req = urllib.request.Request(f"https://api.elevenlabs.io/v1/text-to-speech/{vid}?output_format=mp3_44100_128",
-                                 data=body, headers={"Content-Type": "application/json", "xi-api-key": "proxy-injected"})
+                                 data=body, headers={"Content-Type": "application/json", "xi-api-key": api_key()})
     with urllib.request.urlopen(req, timeout=120) as r:
         out.write_bytes(r.read())
     print("TTS", cid)
