@@ -72,33 +72,27 @@ function floorAndChairs(seats) {
   return s;
 }
 
-// Familie: gibt SVG für alle Personen zurück; st = Zustandsobjekt
+// Familie: sitzt ruhig am Tisch, Hände liegen auf dem Tisch (keine Arm- oder Essbewegungen)
 function family(t, st) {
   let s = '';
   const N = SEATY - 230;
+  const rest = (x, sc) => ({ hL: [x - 58 * sc, TY - 4], hR: [x + 58 * sc, TY - 4] });
   if (st.momOp > 0) {
-    const toM = st.eat ? eat(t, .3) : 0;
     s += person({ x: SEAT.mom, neck: N, hair: 'mom', hairCol: mix('#8a5a3c', '#d8d8de', st.momGrey || 0), skin: '#f6d1b0', shirt: '#3fae7a', t,
       look: st.momLook || [6, 0], mouth: st.momMouth || 'smile', brows: st.momBrows, blink: blinkAt(t, 1), op: st.momOp, age: st.momGrey,
-      legs: 'sit', foot: FLOOR, pants: '#3a3550', hL: [SEAT.mom - 60, TY - 6], hR: [SEAT.mom + 50 - toM * 30, TY - 10 - toM * 160], item: (x, y) => fork(x, y, toM) });
+      legs: 'sit', foot: FLOOR, pants: '#3a3550', ...rest(SEAT.mom, 1) });
   }
   if (st.lilyOp > 0) {
     const ls = st.lilyS || .8, ln = SEATY - 230 * ls;
-    const toM = st.eat && !st.lilyHand ? eat(t, 1.1) : 0;
-    let hR = [SEAT.lily + 46 * ls - toM * 26, TY - 10 - toM * (TY - ln + 20)];
-    if (st.lilyHand) hR = [lerp(hR[0], SEAT.lily + 80, st.lilyHand), lerp(hR[1], ln - 60, st.lilyHand)];
     s += person({ x: SEAT.lily, neck: ln, s: ls, hair: st.lilyHair || 'lily', hairCol: mix('#c0642e', '#d8d8de', st.lilyGrey || 0), skin: '#f8d8bc', shirt: SUN, t,
       look: st.lilyLook || [0, 0], mouth: st.lilyMouth || 'smile', brows: st.lilyBrows, blink: blinkAt(t, 3), op: st.lilyOp, age: st.lilyGrey,
-      legs: 'sit', foot: FLOOR - 30 * (1 - ls) / .2, pants: '#4a5a8a', hL: [SEAT.lily - 50 * ls, TY - 6], hR, item: st.lilyHand ? null : (x, y) => fork(x, y, toM) });
+      legs: 'sit', foot: FLOOR - 30 * (1 - ls) / .2, pants: '#4a5a8a', ...rest(SEAT.lily, ls) });
   }
   if (st.benOp > 0) {
-    const toM = st.eat && !st.benPalm ? eat(t, 1.9) : 0;
-    let hL = [SEAT.ben - 60, TY - 6];
     const bn = SEATY - 230 * .95;
-    if (st.benPalm) hL = [lerp(hL[0], SEAT.ben - 10, st.benPalm), lerp(hL[1], bn - 70, st.benPalm)];
     s += person({ x: SEAT.ben, neck: bn, s: .95, hair: 'ben', hairCol: mix('#2a1c16', '#d8d8de', st.benGrey || 0), skin: '#e8b48c', shirt: '#4c6ef5', t,
       look: st.benLook || [-4, 0], mouth: st.benMouth || 'smile', brows: st.benBrows, blink: blinkAt(t, 5), op: st.benOp, age: st.benGrey,
-      legs: 'sit', foot: FLOOR, pants: '#2d3a5a', hL, hR: [SEAT.ben + 50 - toM * 30, TY - 10 - toM * 160], item: (x, y) => fork(x, y, toM) });
+      legs: 'sit', foot: FLOOR, pants: '#2d3a5a', ...rest(SEAT.ben, .95) });
   }
   (st.extra || []).forEach(e => s += e);
   return s;
@@ -234,9 +228,9 @@ function sceneDinnerLapse(t) {
   const kidIn = back(prog(k, .68, .78)), kid2 = back(prog(k, .74, .84));
   fam.extra = [];
   if (kidIn > 0) fam.extra.push(`<g transform="translate(${SEAT.mom} ${FLOOR}) scale(${kidIn}) translate(${-SEAT.mom} ${-FLOOR})">` +
-    person({ x: SEAT.mom, neck: SEATY - 230 * .78, s: .78, legs: 'sit', foot: FLOOR - 40, pants: '#2d3a5a', hair: 'short', hairCol: '#222', skin: '#c98d64', shirt: '#4cc9f0', look: [8, 0], blink: blinkAt(t, 8), mouth: 'grin', hL: [SEAT.mom - 44, TY - 6], hR: [SEAT.mom + 44, TY - 6] }) + '</g>');
+    person({ x: SEAT.mom, neck: SEATY - 230 * .78, s: .78, legs: 'sit', foot: FLOOR - 40, pants: '#2d3a5a', hair: 'short', hairCol: '#222', skin: '#c98d64', shirt: '#4cc9f0', look: [8, 0], blink: blinkAt(t, 8), mouth: 'grin', hL: [SEAT.mom - 46, TY - 4], hR: [SEAT.mom + 46, TY - 4] }) + '</g>');
   if (kid2 > 0) fam.extra.push(`<g transform="translate(${SEAT.ben} ${FLOOR}) scale(${kid2}) translate(${-SEAT.ben} ${-FLOOR})">` +
-    person({ x: SEAT.ben, neck: SEATY - 230 * .76, s: .76, legs: 'sit', foot: FLOOR - 40, pants: '#3a3550', hair: 'long', hairCol: '#e0b050', skin: '#f6d1b0', shirt: '#b07cff', look: [10, -2], blink: blinkAt(t, 9), mouth: 'smile', hL: [SEAT.ben - 44, TY - 6], hR: [SEAT.ben + 44, TY - 6] }) + '</g>');
+    person({ x: SEAT.ben, neck: SEATY - 230 * .76, s: .76, legs: 'sit', foot: FLOOR - 40, pants: '#3a3550', hair: 'long', hairCol: '#e0b050', skin: '#f6d1b0', shirt: '#b07cff', look: [10, -2], blink: blinkAt(t, 9), mouth: 'smile', hL: [SEAT.ben - 46, TY - 4], hR: [SEAT.ben + 46, TY - 4] }) + '</g>');
   // Roboter trinkt immer wieder
   const c = (t * 1.5) % 1, dk = k > 0 && k < 1 ? (c < .5 ? ease(c * 2) : ease((1 - c) * 2)) : 0;
   const fin = F('s22', .86);

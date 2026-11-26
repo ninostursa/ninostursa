@@ -7,7 +7,7 @@ Gilt für alle neuen Erklärvideos. Kanal: **Patent Future** (@patentfuture). Di
 ## Look
 - **Flache 2D-Vektorgrafik**, keine Umrisslinien, weiche Verläufe, Leuchten, schwebende Staubpartikel, dunkle Vignette.
 - **Farben:** Erklärteile in Petrol/Navy (`#06121c` → `#10283a`) mit Mint `#5ef2c8`. Dazu Koralle `#ff7a59`, Sonnengelb `#ffd166` und warmes Pflaume-Abendlicht für Szenen zu Hause.
-- **Figuren sind gezeichnete Menschen, keine Strichmännchen:** Haut, Haare, Kleidung, Augen mit Glanzpunkt, Brauen, Nase, Mund mit Ausdruck. Wer sitzt, sitzt auf einem Stuhl mit sichtbaren Beinen.
+- **Figuren sind gezeichnete Menschen, keine Strichmännchen:** Haut, Haare, Kleidung, Augen mit Glanzpunkt, Brauen, Nase, Mund mit Ausdruck. Wer sitzt, sitzt auf einem Stuhl mit sichtbaren Beinen. Figuren am Tisch sitzen ruhig, die Hände liegen auf dem Tisch, ohne Ess- oder Armbewegungen. Lebendig wirken sie durch Blicke, Blinzeln und Mimik.
 - **Bilder an der Wand:** Die Porträts werden immer auf den Rahmen beschnitten.
 - **Figuren pro Folge neu:** passend zum Thema, aber immer im gleichen Zeichenstil (der Roboter-Papa und die Familie Miller gehören nur zu File 001).
 - **Schrift:** Inter Black für Schlagzeilen, JetBrains Mono für Daten und Etiketten.

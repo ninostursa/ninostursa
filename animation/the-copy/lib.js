@@ -332,7 +332,7 @@ function plate(x, y, food, t, op = 1) {
     const ph = ((t * 40 + i * 25) % 70);
     st += `<path d="M${x - 22 + i * 22} ${y - 30 - ph} q 10 -12 0 -24 q -10 -12 0 -24" stroke="#fff" stroke-width="5" fill="none" opacity="${.3 * (1 - ph / 70)}" stroke-linecap="round"/>`;
   }
-  return `<g opacity="${op}">${st}<ellipse cx="${x}" cy="${y + 2}" rx="96" ry="20" fill="#f7f3ec"/><ellipse cx="${x}" cy="${y - 1}" rx="74" ry="13" fill="#e4ddd2"/>
+  return `<g opacity="${op}">${st}<g transform="translate(${x + 118} ${y + 6}) rotate(-80)"><rect x="-4" y="-60" width="8" height="60" rx="4" fill="#cfd5dd"/><path d="M-10 -60 L-10 -78 M0 -60 L0 -80 M10 -60 L10 -78" stroke="#cfd5dd" stroke-width="4" stroke-linecap="round"/></g><ellipse cx="${x}" cy="${y + 2}" rx="96" ry="20" fill="#f7f3ec"/><ellipse cx="${x}" cy="${y - 1}" rx="74" ry="13" fill="#e4ddd2"/>
     ${food ? `<path d="M${x - 48} ${y - 2} q 14 -34 30 -10 q 14 -32 30 -8 q 14 -26 28 6 Z" fill="#f2b84b"/><circle cx="${x - 8}" cy="${y - 18}" r="12" fill="#d9472b"/><circle cx="${x + 18}" cy="${y - 13}" r="9" fill="#d9472b"/>` : ''}</g>`;
 }
 function stamp(str, x, y, k, color = MINT, rot = -10, size = 70) {
