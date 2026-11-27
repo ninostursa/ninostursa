@@ -5,31 +5,33 @@ const camLerp = (k, a, b) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2
 
 // ======================= ESSZIMMER =======================
 const TY = 700, FLOOR = 990, SEATY = 780;   // Tischkante, Boden, Sitzhöhe                      // Tischkante
-const SEAT = { mom: 430, lily: 800, ben: 1150, bot: 1500 };
+const SEAT = { mom: 290, lily: 740, ben: 1180, bot: 1600 };
+const TBL = 420, TBR = 1500;   // Tischenden: Mama und Papa sitzen am Kopf
 const eat = (t, ph) => { const c = ((t + ph) % 2.6) / 2.6; return c < .5 ? ease(c * 2) : ease((1 - c) * 2); };
 
+const WX = 340, WY = -50;   // Fenster: nach rechts und etwas nach oben verschoben
 function room(t, dayK = 0) {
-  let s = `<linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c1f33"/><stop offset=".65" stop-color="#5a3446"/><stop offset="1" stop-color="#6e3d4a"/></linearGradient>
+  let s = `<linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a5e"/><stop offset=".6" stop-color="#c58a74"/><stop offset="1" stop-color="#d49a7c"/></linearGradient>
   <rect x="-400" y="-400" width="${W + 800}" height="${FLOOR + 400}" fill="url(#wall)"/>`;
-  for (let i = -4; i < 24; i++) s += `<rect x="${i * 100}" y="-400" width="34" height="${FLOOR + 400}" fill="#fff" opacity=".022"/>`;
-  const top = mix('#101a3d', '#6fc3ff', dayK), bot = mix('#2a2d5e', '#ffd6a0', dayK);
+  for (let i = -4; i < 24; i++) s += `<rect x="${i * 100}" y="-400" width="34" height="${FLOOR + 400}" fill="#fff" opacity=".045"/>`;
+  const top = mix('#4a5aa8', '#6fc3ff', dayK), bot = mix('#ffb07a', '#ffd6a0', dayK);
   s += `<linearGradient id="win" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bot}"/></linearGradient>
-  <rect x="80" y="120" width="300" height="360" rx="16" fill="#1c1420"/><rect x="96" y="136" width="268" height="328" rx="8" fill="url(#win)"/>`;
+  <rect x="${80 + WX}" y="${120 + WY}" width="300" height="360" rx="16" fill="#f3e6d6"/><rect x="${96 + WX}" y="${136 + WY}" width="268" height="328" rx="8" fill="url(#win)"/>`;
   const R = rng(11);
-  for (let i = 0; i < 26; i++) { const sx = 100 + R() * 260, sy = 140 + R() * 300, ph = R() * 6; s += `<circle cx="${sx}" cy="${sy}" r="${1 + R() * 2}" fill="#fff" opacity="${(1 - dayK) * (.4 + .5 * Math.sin(t * 2 + ph) ** 2)}"/>`; }
-  s += `<circle cx="300" cy="200" r="30" fill="${dayK > .5 ? '#fff4c2' : '#f2f0e6'}"/>
-  <rect x="225" y="136" width="10" height="328" fill="#1c1420"/><rect x="96" y="295" width="268" height="10" fill="#1c1420"/>`;
+  for (let i = 0; i < 26; i++) { const sx = WX + 100 + R() * 260, sy = WY + 140 + R() * 300, ph = R() * 6; s += `<circle cx="${sx}" cy="${sy}" r="${1 + R() * 2}" fill="#fff" opacity="${(1 - dayK) * (.2 + .3 * Math.sin(t * 2 + ph) ** 2) * (sy < 300 + WY ? 1 : 0)}"/>`; }
+  s += `<circle cx="${300 + WX}" cy="${200 + WY}" r="30" fill="${dayK > .5 ? '#fff4c2' : '#f2f0e6'}"/>
+  <rect x="${225 + WX}" y="${136 + WY}" width="10" height="328" fill="#f3e6d6"/><rect x="${96 + WX}" y="${295 + WY}" width="268" height="10" fill="#f3e6d6"/>`;
   return s;
 }
 function lamp(t) {
   return `<line x1="960" y1="-400" x2="960" y2="215" stroke="#1a1018" stroke-width="6"/>
-    <polygon points="260,${TY + 6} 1660,${TY + 6} 1040,300 880,300" fill="#ffe2b0" opacity=".16"/>
-    <ellipse cx="960" cy="${TY - 200}" rx="900" ry="440" fill="url(#lampGlow)" opacity=".7"/>
+    <polygon points="${TBL + 40},${TY + 6} ${TBR - 40},${TY + 6} 1040,300 880,300" fill="#fff0c8" opacity=".24"/>
+    <ellipse cx="960" cy="${TY - 220}" rx="1250" ry="700" fill="url(#lampGlow)"/><ellipse cx="960" cy="330" rx="160" ry="90" fill="#fff3c8" opacity=".35" filter="url(#glow)"/>
     <path d="M880 215 L1040 215 L1100 305 L820 305 Z" fill="${CORAL}"/><path d="M990 215 L1040 215 L1100 305 L1030 305 Z" fill="#e0603f"/>
     <ellipse cx="960" cy="308" rx="52" ry="14" fill="#fff6d8"/>`;
 }
 // Bilderrahmen; Nr. 0 = Papa (Gold), weitere erscheinen im Zeitraffer
-const FRAMES = [[1700, 190, 'dad'], [1830, 260, 'a'], [1610, 300, 'b'], [1280, 170, 'mom'], [1420, 210, 'c'], [1880, 110, 'd']];
+const FRAMES = [[1480, 190, 'dad'], [1620, 260, 'a'], [1355, 345, 'b'], [1240, 140, 'mom'], [1780, 200, 'c'], [1640, 95, 'd']];
 function frames(n, hl = 0) {
   let s = '';
   FRAMES.forEach(([fx, fy, who], i) => {
@@ -54,18 +56,31 @@ function plant(k) {
   for (let i = 0; i < 7; i++) l += `<g transform="rotate(${-90 + (i - 3) * 24})"><ellipse cx="${55 + (i % 3) * 18}" cy="0" rx="${55 + (i % 3) * 18}" ry="20" fill="${i % 2 ? '#3fae7a' : '#2e8c62'}"/></g>`;
   return `<g transform="translate(1860 ${FLOOR - 86}) scale(${sc})">${l}<path d="M-42 0 L42 0 L32 86 L-32 86 Z" fill="#c8643f"/></g>`;
 }
-function table() {
-  return `<rect x="220" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/><rect x="1706" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/>
-    <rect x="150" y="${TY}" width="1660" height="28" rx="10" fill="#f9f3ea"/>
-    <rect x="164" y="${TY + 24}" width="1632" height="40" fill="#efe5d6"/>
-    <rect x="164" y="${TY + 24}" width="1632" height="10" fill="#000" opacity=".08"/>
-    <rect x="164" y="${TY + 56}" width="1632" height="18" fill="${CORAL}"/>
-    ${Array.from({ length: 41 }, (_, i) => `<circle cx="${184 + i * 40}" cy="${TY + 74}" r="10" fill="${CORAL}"/>`).join('')}`;
+function table(TBL_ = TBL, TBR_ = TBR) {
+  const TBL = TBL_, TBR = TBR_, w = TBR - TBL, n = Math.floor((w - 40) / 40) + 1;
+  return `<rect x="${TBL + 50}" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/><rect x="${TBR - 84}" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/>
+    <rect x="${TBL}" y="${TY}" width="${w}" height="28" rx="10" fill="#f9f3ea"/>
+    <rect x="${TBL + 14}" y="${TY + 24}" width="${w - 28}" height="40" fill="#efe5d6"/>
+    <rect x="${TBL + 14}" y="${TY + 24}" width="${w - 28}" height="10" fill="#000" opacity=".08"/>
+    <rect x="${TBL + 14}" y="${TY + 56}" width="${w - 28}" height="18" fill="${CORAL}"/>
+    ${Array.from({ length: n }, (_, i) => `<circle cx="${TBL + 34 + i * 40}" cy="${TY + 74}" r="10" fill="${CORAL}"/>`).join('')}`;
+}
+// Mitte des Tisches: Auflaufform mit Dampf, Brotkorb, Kerze
+function tableCenter(t) {
+  const st = [0, 1, 2].map(i => { const k = ((t * .35 + i / 3) % 1); return `<path d="M${930 + i * 30} ${TY - 70 - k * 60} q 10 -14 0 -28 q -10 -14 0 -28" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity="${.25 * Math.sin(k * Math.PI)}"/>`; }).join('');
+  // große Spaghetti-Schüssel ("Spaghetti, as always")
+  return `${st}<ellipse cx="960" cy="${TY - 66}" rx="70" ry="26" fill="#f4d27a"/>
+    ${[-40, -14, 12, 38].map((dx, i) => `<path d="M${960 + dx - 26} ${TY - 64} q 14 -${18 + i * 3} 28 -4 q 12 14 24 -2" stroke="#e8b84e" stroke-width="5" fill="none" stroke-linecap="round"/>`).join('')}
+    <ellipse cx="972" cy="${TY - 82}" rx="30" ry="14" fill="#d9442f"/><circle cx="948" cy="${TY - 80}" r="9" fill="#8a3a2a"/><circle cx="984" cy="${TY - 88}" r="8" fill="#8a3a2a"/><path d="M990 ${TY - 96} l 10 -8 l 4 10 z" fill="#3fae7a"/>
+    <path d="M876 ${TY - 64} L1044 ${TY - 64} C 1040 ${TY - 20}, 1010 ${TY - 2}, 960 ${TY - 2} C 910 ${TY - 2}, 880 ${TY - 20}, 876 ${TY - 64} Z" fill="#f7f3ec"/>
+    <path d="M880 ${TY - 50} L1040 ${TY - 50} L1036 ${TY - 40} L884 ${TY - 40} Z" fill="${CORAL}" opacity=".85"/>
+    ${[852, 1068].map((cx, i) => `<rect x="${cx - 7}" y="${TY - 96}" width="14" height="94" rx="4" fill="#fff3dd"/><ellipse cx="${cx}" cy="${TY - 108 + Math.sin(t * 7 + i) * 1.5}" rx="7" ry="12" fill="${SUN}"/><circle cx="${cx}" cy="${TY - 108}" r="34" fill="${SUN}" opacity="${.14 + .04 * Math.sin(t * 9 + i)}"/>`).join('')}`;
 }
 function floorAndChairs(seats) {
-  let s = `<rect x="-400" y="${FLOOR}" width="${W + 800}" height="600" fill="#3a2630"/><rect x="-400" y="${FLOOR - 14}" width="${W + 800}" height="16" fill="#2a1a22"/>`;
-  for (let i = 0; i < 6; i++) s += `<rect x="-400" y="${FLOOR + 22 + i * 30}" width="${W + 800}" height="3" fill="#000" opacity=".15"/>`;
-  s += `<ellipse cx="960" cy="${FLOOR + 6}" rx="900" ry="26" fill="#000" opacity=".25"/>`;
+  let s = `<rect x="-400" y="${FLOOR}" width="${W + 800}" height="600" fill="#8a5a42"/><rect x="-400" y="${FLOOR - 14}" width="${W + 800}" height="16" fill="#6b4232"/>`;
+  for (let i = 0; i < 6; i++) s += `<rect x="-400" y="${FLOOR + 22 + i * 30}" width="${W + 800}" height="3" fill="#000" opacity=".1"/>`;
+  s += `<ellipse cx="960" cy="${FLOOR + 6}" rx="900" ry="26" fill="#000" opacity=".15"/>`;
+  s += `<ellipse cx="960" cy="${FLOOR + 30}" rx="860" ry="44" fill="#c8574a"/><ellipse cx="960" cy="${FLOOR + 30}" rx="820" ry="34" fill="none" stroke="${SUN}" stroke-width="4" stroke-dasharray="16 12" opacity=".7"/>`;
   seats.forEach(x => s += `<rect x="${x - 92}" y="${SEATY - 290}" width="184" height="300" rx="34" fill="#5a3a2e"/><rect x="${x - 76}" y="${SEATY - 274}" width="152" height="268" rx="26" fill="#6b4636"/>
     <rect x="${x - 100}" y="${SEATY + 4}" width="200" height="26" rx="10" fill="#5a3a2e"/>
     <rect x="${x - 92}" y="${SEATY + 28}" width="18" height="${FLOOR - SEATY - 30}" fill="#4a2e24"/><rect x="${x + 74}" y="${SEATY + 28}" width="18" height="${FLOOR - SEATY - 30}" fill="#4a2e24"/>`);
@@ -79,8 +94,8 @@ function family(t, st) {
   const rest = (x, sc) => ({ hL: [x - 58 * sc, TY - 4], hR: [x + 58 * sc, TY - 4] });
   if (st.momOp > 0) {
     s += person({ x: SEAT.mom, neck: N, hair: 'mom', hairCol: mix('#8a5a3c', '#d8d8de', st.momGrey || 0), skin: '#f6d1b0', shirt: '#3fae7a', t,
-      look: st.momLook || [6, 0], mouth: st.momMouth || 'smile', brows: st.momBrows, blink: blinkAt(t, 1), op: st.momOp, age: st.momGrey,
-      legs: 'sit', foot: FLOOR, pants: '#3a3550', ...rest(SEAT.mom, 1) });
+      look: st.momLook || [12, 0], mouth: st.momMouth || 'smile', brows: st.momBrows, blink: blinkAt(t, 1), op: st.momOp, age: st.momGrey,
+      legs: 'sit', foot: FLOOR, pants: '#3a3550', hL: [SEAT.mom - 40, SEATY + 6], hR: [TBL + 46, TY - 4] });
   }
   if (st.lilyOp > 0) {
     const ls = st.lilyS || .8, ln = SEATY - 230 * ls;
@@ -100,20 +115,20 @@ function family(t, st) {
 
 // Roboter am Tisch inkl. Öl-Handlung. st.pour/st.drink 0..1
 function botAtTable(t, st) {
-  const bx = SEAT.bot, n = SEATY - 205, CAN = [1700, TY + 4], GL = [1620, TY + 2];
-  let hR = [bx + 84, TY + 44], hL = [bx - 84, TY + 44], can = CAN, canTilt = 0, gp = GL, gTilt = 0, level = st.level ?? .7;
+  const bx = SEAT.bot, n = SEATY - 205, CAN = [TBR - 70, TY + 4], GL = [TBR - 170, TY + 2];
+  let hR = [bx + 56, SEATY + 6], hL = [TBR - 10, TY - 4], can = CAN, canTilt = 0, gp = GL, gTilt = 0, level = st.level ?? .7;
   if (st.reach > 0) {
-    can = [lerp(CAN[0], 1660, st.lift || 0), lerp(CAN[1], TY - 150, st.lift || 0)];
+    can = [lerp(CAN[0], GL[0] + 40, st.lift || 0), lerp(CAN[1], TY - 150, st.lift || 0)];
     canTilt = -55 * (st.pour || 0);
-    hR = [lerp(hR[0], can[0], st.reach), lerp(hR[1], can[1] - 40, st.reach)];
+    hL = [lerp(hL[0], can[0], st.reach), lerp(hL[1], can[1] - 40, st.reach)];
   }
   if (st.drink > 0) {
-    gp = [lerp(GL[0], bx + 40, st.drink), lerp(GL[1], n - 60, st.drink)]; gTilt = -60 * st.drink;
-    hR = [gp[0] + 12, gp[1] - 40];
+    gp = [lerp(GL[0], bx - 40, st.drink), lerp(GL[1], n - 60, st.drink)]; gTilt = 60 * st.drink;
+    hL = [gp[0] - 12, gp[1] - 40];
   }
-  if (st.wave > 0) hL = [lerp(hL[0], bx - 120 + Math.sin(t * 11) * 22, st.wave), lerp(hL[1], n - 70, st.wave)];
+  if (st.wave > 0) hR = [lerp(hR[0], bx + 120 + Math.sin(t * 11) * 22, st.wave), lerp(hR[1], n - 70, st.wave)];
   if (st.hRover) hR = st.hRover;
-  let s = robot({ x: bx, neck: n, s: .92, t, legs: 'sit', foot: FLOOR, eyes: st.eyes || 'on', look: st.look || [-4, 0], blink: blinkAt(t, 6), hR, hL, steam: st.steam || 0,
+  let s = robot({ x: bx, neck: n, s: .92, t, legs: 'sit', foot: FLOOR, eyes: st.eyes || 'on', look: st.look || [-10, 0], blink: blinkAt(t, 6), hR, hL, steam: st.steam || 0,
     mouth: st.mouth, patch: st.patch, item: st.item, screen: st.screen });
   if ((st.pour || 0) > .3) {
     const a = (canTilt - 42) * Math.PI / 180, sx = can[0] + Math.cos(a) * 150, sy = can[1] + Math.sin(a) * 150;
@@ -127,7 +142,8 @@ function dinnerBase(t, o) {
   let s = room(t, o.dayK || 0) + frames(o.frames ?? 3, o.dadHl || 0) + lamp(t) + floorAndChairs([SEAT.mom, SEAT.lily, SEAT.ben, SEAT.bot]) + plant(o.plant || 0);
   s += family(t, o.fam);
   s += botAtTable(t, o.bot);
-  s += plate(SEAT.mom, TY + 4, true, t, o.fam.momOp > 0 || o.platesAll ? 1 : 0);
+  s += tableCenter(t);
+  s += plate(TBL + 112, TY + 4, true, t, o.fam.momOp > 0 || o.platesAll ? 1 : 0);
   s += plate(SEAT.lily, TY + 4, true, t, o.fam.lilyOp > 0 ? 1 : 0);
   s += plate(SEAT.ben, TY + 4, true, t, o.fam.benOp > 0 || o.platesAll ? 1 : 0);
   s += table();
@@ -167,16 +183,16 @@ function sceneDinnerOpen(t) {
   let c = [1.0, 960, 540];
   const zBot = inOut(t, F('s01', .45), F('s01', .55), F('s01', .72), F('s01', .8));
   const zPh = inOut(t, F('s01', .74), F('s01', .84), E('s01') + .3, S('s02') + .3);
-  c = camLerp(ease(zBot), c, [1.45, 1500, 560]);
-  c = camLerp(ease(zPh), c, [1.9, 1700, 260]);
+  c = camLerp(ease(zBot), c, [1.45, SEAT.bot - 40, 560]);
+  c = camLerp(ease(zPh), c, [1.9, FRAMES[0][0], 260]);
   const zOil = inOut(t, r0 - .2, r0 + .4, d0 + 2.4, d0 + 3.2);
-  c = camLerp(zOil * .6, c, [1.35, 1560, 600]);
+  c = camLerp(zOil * .6, c, [1.35, 1460, 600]);
   const zLily = ease(prog(t, F('s03', .45), E('s03')));
-  c = camLerp(zLily * .7, c, [1.5, 800, 600]);
+  c = camLerp(zLily * .7, c, [1.5, SEAT.lily, 600]);
   c[0] *= 1 + .03 * Math.sin(t * .3);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot, dadHl: photoK })}
-    ${bubble(1360, 360, "…and then the toaster said: I'm toast!", joke, { robot: true, tail: 80, size: 34, maxW: 520 })}
-    ${photoK > 0 ? tag('IN LOVING MEMORY · 2077', 1585, 330, photoK, SUN) : ''}</g>`;
+    ${bubble(1400, 400, "…and then the toaster said: I'm toast!", joke, { robot: true, tail: 80, size: 34, maxW: 520 })}
+    ${photoK > 0 ? tag('IN LOVING MEMORY · 2077', FRAMES[0][0] - 115, 78, photoK, SUN) : ''}</g>`;
   s += headline(['WOULD YOU SIT', 'AT THIS TABLE?'], 960, 150, t, F('s03', .02), F('s03', .42), { size: 96 });
   return s;
 }
@@ -191,9 +207,9 @@ function sceneDinnerAd(t) {
     hRover: [lerp(SEAT.bot + 70, SEAT.bot + 150, box), lerp(TY - 8, 480, box)],
     item: (x, y) => box > 0 ? cereal(x + 30, y - 10, box) : '',
   };
-  const c = camLerp(ease(prog(t, a, a + 1.2)), [1.0, 960, 540], [1.45, 1440, 560]);
+  const c = camLerp(ease(prog(t, a, a + 1.2)), [1.0, 960, 540], [1.45, SEAT.bot - 60, 560]);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot })}
-    ${sparkles(1640, 390, t, box)}</g>`;
+    ${sparkles(SEAT.bot + 140, 390, t, box)}</g>`;
   s += tag('SPONSORED MESSAGE', 60, 60, prog(t, a + .4, a + .8), SUN);
   s += stamp('AD', 1720, 900, prog(t, F('s19r', .7), F('s19r', .8)), CORAL, 12, 90);
   return s;
@@ -228,7 +244,7 @@ function sceneDinnerLapse(t) {
   const kidIn = back(prog(k, .68, .78)), kid2 = back(prog(k, .74, .84));
   fam.extra = [];
   if (kidIn > 0) fam.extra.push(`<g transform="translate(${SEAT.mom} ${FLOOR}) scale(${kidIn}) translate(${-SEAT.mom} ${-FLOOR})">` +
-    person({ x: SEAT.mom, neck: SEATY - 230 * .78, s: .78, legs: 'sit', foot: FLOOR - 40, pants: '#2d3a5a', hair: 'short', hairCol: '#222', skin: '#c98d64', shirt: '#4cc9f0', look: [8, 0], blink: blinkAt(t, 8), mouth: 'grin', hL: [SEAT.mom - 46, TY - 4], hR: [SEAT.mom + 46, TY - 4] }) + '</g>');
+    person({ x: SEAT.mom, neck: SEATY - 230 * .78, s: .78, legs: 'sit', foot: FLOOR - 40, pants: '#2d3a5a', hair: 'short', hairCol: '#222', skin: '#c98d64', shirt: '#4cc9f0', look: [8, 0], blink: blinkAt(t, 8), mouth: 'grin', hL: [SEAT.mom - 34, SEATY + 2], hR: [TBL + 40, TY - 4] }) + '</g>');
   if (kid2 > 0) fam.extra.push(`<g transform="translate(${SEAT.ben} ${FLOOR}) scale(${kid2}) translate(${-SEAT.ben} ${-FLOOR})">` +
     person({ x: SEAT.ben, neck: SEATY - 230 * .76, s: .76, legs: 'sit', foot: FLOOR - 40, pants: '#3a3550', hair: 'long', hairCol: '#e0b050', skin: '#f6d1b0', shirt: '#b07cff', look: [10, -2], blink: blinkAt(t, 9), mouth: 'smile', hL: [SEAT.ben - 46, TY - 4], hR: [SEAT.ben + 46, TY - 4] }) + '</g>');
   // Roboter trinkt immer wieder
@@ -262,9 +278,9 @@ function sceneDinnerPayoff(t) {
   }
   fam.t = t;
   let c = [1.0, 960, 540];
-  c = camLerp(ease(prog(t, S('s24') - .4, S('s24') + .6)), c, [1.55, 800, 600]);
-  c = camLerp(ease(prog(t, S('s25') - .2, S('s25') + .8)), c, [1.7, 1480, 560]);
-  c = camLerp(ease(prog(t, F('s25', .84), E('s25'))), c, [2.0, 1500, 520]);
+  c = camLerp(ease(prog(t, S('s24') - .4, S('s24') + .6)), c, [1.55, SEAT.lily, 600]);
+  c = camLerp(ease(prog(t, S('s25') - .2, S('s25') + .8)), c, [1.7, SEAT.bot - 20, 560]);
+  c = camLerp(ease(prog(t, F('s25', .84), E('s25'))), c, [2.0, SEAT.bot, 520]);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot })}</g>`;
   s += bubble(760, 170, 'Dad? Are you still you?', inOut(t, S('s24') + .1, S('s24') + .4, E('s24') + 1.2, E('s24') + 1.5), { tail: 40, size: 44 });
   s += bubble(1240, 150, 'I think so.', inOut(t, S('s25') + .1, S('s25') + .4, F('s25', .4), F('s25', .45)), { robot: true, tail: 120, size: 40 });
@@ -854,7 +870,7 @@ function render(t) {
     <filter id="glow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="22"/></filter>
     <filter id="glowS" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     <filter id="sepia"><feColorMatrix type="matrix" values=".39 .77 .19 0 0 .35 .69 .17 0 0 .27 .53 .13 0 0 0 0 0 1 0"/></filter>
-    <radialGradient id="lampGlow" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="#ffd79a" stop-opacity=".75"/><stop offset="1" stop-color="#ffd79a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lampGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe3a8" stop-opacity=".8"/><stop offset=".45" stop-color="#ffd79a" stop-opacity=".35"/><stop offset="1" stop-color="#ffd79a" stop-opacity="0"/></radialGradient>
     <linearGradient id="tvShine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
     <linearGradient id="fog" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#10283a" stop-opacity="0"/><stop offset=".5" stop-color="#9fc" stop-opacity=".12"/><stop offset="1" stop-color="#cfe" stop-opacity=".25"/></linearGradient>
     <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>

@@ -127,9 +127,10 @@ const HAIR = {
     (x, y, s, c) => `<path d="M${x - 62 * s} ${y + 46 * s} C ${x - 78 * s} ${y - 40 * s}, ${x - 40 * s} ${y - 80 * s}, ${x} ${y - 78 * s} C ${x + 40 * s} ${y - 80 * s}, ${x + 78 * s} ${y - 40 * s}, ${x + 62 * s} ${y + 46 * s} Z" fill="${c}"/>`,
     (x, y, s, c) => `<path d="M${x - 54 * s} ${y + 4 * s} C ${x - 58 * s} ${y - 60 * s}, ${x + 20 * s} ${y - 82 * s}, ${x + 54 * s} ${y - 20 * s} C ${x + 30 * s} ${y - 40 * s}, ${x - 10 * s} ${y - 30 * s}, ${x - 30 * s} ${y - 40 * s} C ${x - 40 * s} ${y - 20 * s}, ${x - 46 * s} ${y - 8 * s}, ${x - 54 * s} ${y + 4 * s} Z" fill="${c}"/>`],
   lily: [
-    (x, y, s, c) => `<circle cx="${x - 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/><circle cx="${x + 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/>
+    (x, y, s, c) => `<ellipse cx="${x}" cy="${y - 6 * s}" rx="${55 * s}" ry="${62 * s}" fill="${c}"/><circle cx="${x - 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/><circle cx="${x + 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/>
       <rect x="${x - 70 * s}" y="${y - 32 * s}" width="${14 * s}" height="${8 * s}" rx="3" fill="${CORAL}"/><rect x="${x + 56 * s}" y="${y - 32 * s}" width="${14 * s}" height="${8 * s}" rx="3" fill="${CORAL}"/>`,
-    (x, y, s, c) => `<path d="M${x - 50 * s} ${y - 2 * s} C ${x - 56 * s} ${y - 70 * s}, ${x + 56 * s} ${y - 70 * s}, ${x + 50 * s} ${y - 2 * s} C ${x + 44 * s} ${y - 30 * s}, ${x + 20 * s} ${y - 26 * s}, ${x + 10 * s} ${y - 36 * s} C ${x - 4 * s} ${y - 24 * s}, ${x - 30 * s} ${y - 30 * s}, ${x - 50 * s} ${y - 2 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 54 * s} ${y + 6 * s} C ${x - 62 * s} ${y - 88 * s}, ${x + 62 * s} ${y - 88 * s}, ${x + 54 * s} ${y + 6 * s} C ${x + 46 * s} ${y - 24 * s}, ${x + 24 * s} ${y - 22 * s}, ${x + 12 * s} ${y - 36 * s} C ${x - 2 * s} ${y - 22 * s}, ${x - 30 * s} ${y - 26 * s}, ${x - 54 * s} ${y + 6 * s} Z" fill="${c}"/>
+      <path d="M${x - 30 * s} ${y - 52 * s} Q ${x - 8 * s} ${y - 62 * s} ${x + 14 * s} ${y - 54 * s}" stroke="#fff" stroke-width="${4 * s}" fill="none" stroke-linecap="round" opacity=".22"/>`],
   ben: [
     (x, y, s, c) => '',
     (x, y, s, c) => `<path d="M${x - 52 * s} ${y - 4 * s} L${x - 58 * s} ${y - 48 * s} L${x - 34 * s} ${y - 58 * s} L${x - 26 * s} ${y - 84 * s} L${x} ${y - 66 * s} L${x + 18 * s} ${y - 86 * s} L${x + 30 * s} ${y - 60 * s} L${x + 56 * s} ${y - 62 * s} L${x + 52 * s} ${y - 6 * s} C ${x + 30 * s} ${y - 36 * s}, ${x - 30 * s} ${y - 36 * s}, ${x - 52 * s} ${y - 4 * s} Z" fill="${c}"/>`],
