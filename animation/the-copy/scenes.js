@@ -324,7 +324,7 @@ function sceneChat(t) {
   // Joshua am Schreibtisch, vom Bildschirm angeleuchtet
   s += `<ellipse cx="560" cy="560" rx="420" ry="300" fill="${MINT}" opacity=".10" filter="url(#glow)"/>`;
   const typing = (t * 3) % 1 < .5;
-  s += person({ x: 560, neck: 560, s: 1.15, hair: 'short', hairCol: '#2a1c16', skin: '#f0c4a0', shirt: '#3a4256', beard: 'stubble', t,
+  s += person({ x: 560, neck: 560, s: 1.15, hair: 'short', hairCol: '#2a1c16', skin: '#f0c4a0', shirt: '#3a4256', t,
     look: [10, 6], mouth: t > F('s05', .78) ? 'smile' : 'flat', brows: t < F('s05', .5) ? 'worried' : 'neutral', blink: blinkAt(t, 2),
     hL: [470, 850 + (typing ? -6 : 0)], hR: [650, 850 + (typing ? 0 : -6)] });
   s += `<rect x="120" y="850" width="900" height="40" rx="10" fill="#4a3a5a"/><rect x="140" y="890" width="860" height="200" fill="#2a2040"/>

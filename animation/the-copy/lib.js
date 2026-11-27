@@ -125,7 +125,7 @@ const HAIR = {
       <ellipse cx="${mx}" cy="${y + 36 * s}" rx="${15 * s}" ry="${8 * s}" fill="${mix(c, '#f2c6a0', .55)}" opacity=".9"/>`,
   mom: [
     (x, y, s, c) => `<path d="M${x - 62 * s} ${y + 46 * s} C ${x - 78 * s} ${y - 40 * s}, ${x - 40 * s} ${y - 80 * s}, ${x} ${y - 78 * s} C ${x + 40 * s} ${y - 80 * s}, ${x + 78 * s} ${y - 40 * s}, ${x + 62 * s} ${y + 46 * s} Z" fill="${c}"/>`,
-    (x, y, s, c) => `<path d="M${x - 54 * s} ${y + 4 * s} C ${x - 58 * s} ${y - 60 * s}, ${x + 20 * s} ${y - 82 * s}, ${x + 54 * s} ${y - 20 * s} C ${x + 30 * s} ${y - 40 * s}, ${x - 10 * s} ${y - 30 * s}, ${x - 30 * s} ${y - 40 * s} C ${x - 40 * s} ${y - 20 * s}, ${x - 46 * s} ${y - 8 * s}, ${x - 54 * s} ${y + 4 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 54 * s} ${y + 4 * s} C ${x - 60 * s} ${y - 78 * s}, ${x + 30 * s} ${y - 96 * s}, ${x + 54 * s} ${y - 20 * s} C ${x + 30 * s} ${y - 40 * s}, ${x - 10 * s} ${y - 30 * s}, ${x - 30 * s} ${y - 40 * s} C ${x - 40 * s} ${y - 20 * s}, ${x - 46 * s} ${y - 8 * s}, ${x - 54 * s} ${y + 4 * s} Z" fill="${c}"/>`],
   lily: [
     (x, y, s, c) => `<ellipse cx="${x}" cy="${y - 6 * s}" rx="${55 * s}" ry="${62 * s}" fill="${c}"/><circle cx="${x - 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/><circle cx="${x + 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/>
       <rect x="${x - 70 * s}" y="${y - 32 * s}" width="${14 * s}" height="${8 * s}" rx="3" fill="${CORAL}"/><rect x="${x + 56 * s}" y="${y - 32 * s}" width="${14 * s}" height="${8 * s}" rx="3" fill="${CORAL}"/>`,
@@ -136,16 +136,16 @@ const HAIR = {
     (x, y, s, c) => `<path d="M${x - 52 * s} ${y - 4 * s} L${x - 58 * s} ${y - 48 * s} L${x - 34 * s} ${y - 58 * s} L${x - 26 * s} ${y - 84 * s} L${x} ${y - 66 * s} L${x + 18 * s} ${y - 86 * s} L${x + 30 * s} ${y - 60 * s} L${x + 56 * s} ${y - 62 * s} L${x + 52 * s} ${y - 6 * s} C ${x + 30 * s} ${y - 36 * s}, ${x - 30 * s} ${y - 36 * s}, ${x - 52 * s} ${y - 4 * s} Z" fill="${c}"/>`],
   long: [
     (x, y, s, c) => `<path d="M${x - 60 * s} ${y + 110 * s} C ${x - 80 * s} ${y - 40 * s}, ${x - 40 * s} ${y - 82 * s}, ${x} ${y - 80 * s} C ${x + 40 * s} ${y - 82 * s}, ${x + 80 * s} ${y - 40 * s}, ${x + 60 * s} ${y + 110 * s} Z" fill="${c}"/>`,
-    (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 10 * s} C ${x - 60 * s} ${y - 76 * s}, ${x + 60 * s} ${y - 76 * s}, ${x + 52 * s} ${y + 10 * s} C ${x + 40 * s} ${y - 30 * s}, ${x + 4 * s} ${y - 44 * s}, ${x} ${y - 44 * s} C ${x - 4 * s} ${y - 44 * s}, ${x - 40 * s} ${y - 30 * s}, ${x - 52 * s} ${y + 10 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 10 * s} C ${x - 60 * s} ${y - 92 * s}, ${x + 60 * s} ${y - 92 * s}, ${x + 52 * s} ${y + 10 * s} C ${x + 40 * s} ${y - 30 * s}, ${x + 4 * s} ${y - 44 * s}, ${x} ${y - 44 * s} C ${x - 4 * s} ${y - 44 * s}, ${x - 40 * s} ${y - 30 * s}, ${x - 52 * s} ${y + 10 * s} Z" fill="${c}"/>`],
   old: [
     (x, y, s, c) => `<circle cx="${x}" cy="${y - 64 * s}" r="${24 * s}" fill="${c}"/>`,
-    (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 2 * s} C ${x - 60 * s} ${y - 66 * s}, ${x + 60 * s} ${y - 66 * s}, ${x + 52 * s} ${y + 2 * s} C ${x + 40 * s} ${y - 28 * s}, ${x - 40 * s} ${y - 28 * s}, ${x - 52 * s} ${y + 2 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 2 * s} C ${x - 60 * s} ${y - 86 * s}, ${x + 60 * s} ${y - 86 * s}, ${x + 52 * s} ${y + 2 * s} C ${x + 40 * s} ${y - 28 * s}, ${x - 40 * s} ${y - 28 * s}, ${x - 52 * s} ${y + 2 * s} Z" fill="${c}"/>`],
   short: [
     (x, y, s, c) => '',
-    (x, y, s, c) => `<path d="M${x - 51 * s} ${y - 2 * s} C ${x - 56 * s} ${y - 70 * s}, ${x + 56 * s} ${y - 72 * s}, ${x + 51 * s} ${y - 4 * s} C ${x + 36 * s} ${y - 30 * s}, ${x - 36 * s} ${y - 34 * s}, ${x - 51 * s} ${y - 2 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 51 * s} ${y - 2 * s} C ${x - 58 * s} ${y - 86 * s}, ${x + 58 * s} ${y - 86 * s}, ${x + 51 * s} ${y - 4 * s} C ${x + 36 * s} ${y - 30 * s}, ${x - 36 * s} ${y - 34 * s}, ${x - 51 * s} ${y - 2 * s} Z" fill="${c}"/>`],
   pony: [
     (x, y, s, c) => `<path d="M${x + 40 * s} ${y - 40 * s} C ${x + 110 * s} ${y - 40 * s}, ${x + 100 * s} ${y + 40 * s}, ${x + 70 * s} ${y + 70 * s}" stroke="${c}" stroke-width="${26 * s}" fill="none" stroke-linecap="round"/>`,
-    (x, y, s, c) => `<path d="M${x - 51 * s} ${y} C ${x - 56 * s} ${y - 72 * s}, ${x + 56 * s} ${y - 72 * s}, ${x + 51 * s} ${y} C ${x + 30 * s} ${y - 40 * s}, ${x - 30 * s} ${y - 40 * s}, ${x - 51 * s} ${y} Z" fill="${c}"/><circle cx="${x + 46 * s}" cy="${y - 40 * s}" r="${8 * s}" fill="${SUN}"/>`],
+    (x, y, s, c) => `<path d="M${x - 51 * s} ${y} C ${x - 58 * s} ${y - 86 * s}, ${x + 58 * s} ${y - 86 * s}, ${x + 51 * s} ${y} C ${x + 30 * s} ${y - 40 * s}, ${x - 30 * s} ${y - 40 * s}, ${x - 51 * s} ${y} Z" fill="${c}"/><circle cx="${x + 46 * s}" cy="${y - 40 * s}" r="${8 * s}" fill="${SUN}"/>`],
   bald: [(x, y, s, c) => '', (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 4 * s} C ${x - 56 * s} ${y - 20 * s}, ${x - 50 * s} ${y - 30 * s}, ${x - 46 * s} ${y - 30 * s} L${x - 44 * s} ${y + 4 * s} Z M${x + 52 * s} ${y + 4 * s} C ${x + 56 * s} ${y - 20 * s}, ${x + 50 * s} ${y - 30 * s}, ${x + 46 * s} ${y - 30 * s} L${x + 44 * s} ${y + 4 * s} Z" fill="${c}"/>`],
 };
 

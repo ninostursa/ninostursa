@@ -61,6 +61,7 @@ Die ausführliche Vorlage steht in `animation/STIL.md`. Die Referenz ist der Cod
 - **Figuren am Tisch sitzen ruhig.** Keine Essbewegungen und keine unnötigen Armbewegungen, die Hände liegen auf dem Tisch. Lebendig wirken sie durch Blicke, Blinzeln und Mimik.
 - **Arme natürlich:** Ellbogen zeigen nach unten und außen, nie über den Körper. Hände mit Daumen, die der Unterarm-Richtung folgen. Ärmel haben einen feinen dunkleren Rand, damit sie sich vom Shirt abheben.
 - **Bilder an der Wand:** Porträts werden immer auf den Rahmen beschnitten, nichts ragt heraus.
+- **Keine Glatzen bei Figuren mit Haaren und keine Bärte ohne Freigabe.** Vor jedem Rendern `node animation/tools/check-hair.js` laufen lassen. Die Regeln stehen im Skill `.claude/skills/figuren-pruefen/SKILL.md`. Liegt der PC-Ordner nicht direkt im Repository, den Ordner `.claude` aus dem Repository mit hineinkopieren, damit der Skill geladen wird.
 - Texte in Karten oder Kästen dürfen sich nie mit Symbolen überlappen. Im Zweifel die Karte breiter machen oder den Text umbrechen.
 
 **Ton**
