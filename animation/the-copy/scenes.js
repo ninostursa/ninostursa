@@ -659,8 +659,8 @@ function sceneTwoDads(t) {
   const pizzaK = inOut(t, F('s17', .3), F('s17', .38), F('s17', .6), F('s17', .66));
   const tug = Math.sin(t * 9) * 18;
   const midY = 560;
-  let dadHR = [760 + 60, 640], botHL = [1160 - 62, 630];
-  if (point > 0) { dadHR = [lerp(820, 900, point), lerp(640, 560, point)]; botHL = [lerp(1098, 1020, point), lerp(630, 560, point)]; }
+  let dadHR = [760 + 56 * 1.05, 440 + 200 * 1.05], botHL = [1160 - 64, 450 + 204];   // wie die andere, herabhängende Hand
+  if (point > 0) { dadHR = [lerp(dadHR[0], 900, point), lerp(dadHR[1], 560, point)]; botHL = [lerp(botHL[0], 1020, point), lerp(botHL[1], 560, point)]; }
   const grab = Math.max(keysK, pizzaK);
   if (grab > 0) { dadHR = [lerp(dadHR[0], 930 + tug, grab), lerp(dadHR[1], midY, grab)]; botHL = [lerp(botHL[0], 990 + tug, grab), lerp(botHL[1], midY, grab)]; }
   s += person({ x: 760, neck: 440, s: 1.05, legs: 'stand', foot: 1000, hair: 'dad', hairCol: '#3b2a24', beard: 'full', shirt: CORAL, t,
