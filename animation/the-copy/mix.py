@@ -95,9 +95,18 @@ def sfx(kind):
         out = np.zeros(int(1.2 * SR))
         for k, f in enumerate([523, 659, 784, 1046]): c = tone(f, .5, None, .2) * .2; i = int(k * .13 * SR); out[i:i + len(c)] += c
         return out
-    if kind == "lapse":
-        n = noise(7); sw = np.linspace(0, 1, len(n)) ** 2 * np.minimum(1, (len(n) - np.arange(len(n))) / (SR * .4))
-        return (n - lowpass(n, .2)) * sw * .18
+    if kind == "lapse":   # Zeitraffer: Uhr tickt immer schneller + weicher, steigender Klang (kein Rauschen)
+        dur = 7.0; out = np.zeros(int(dur * SR)); t, i = 0.0, 0
+        while t < dur - .2:
+            k = t / dur; f = 1250 if i % 2 == 0 else 950
+            tk = tone(f, .06, None, .012) * (.10 + .06 * k)
+            j = int(t * SR); out[j:j + len(tk)] += tk[:len(out) - j]
+            t += .5 * (1 - k) ** 1.6 + .07; i += 1
+        tt = np.arange(len(out)) / SR; fr = 220 * 2 ** (tt / dur)          # eine Oktave aufwärts
+        ph = 2 * np.pi * np.cumsum(fr) / SR
+        pad = (np.sin(ph) + .5 * np.sin(2 * ph) + .3 * np.sin(1.5 * ph)) * .035
+        fade = np.minimum(1, tt / 1.5) * np.minimum(1, (dur - tt) / .8)
+        return out * np.minimum(1, (dur - tt) / .5) + pad * fade
     if kind == "click": return tone(1800, .05, None, .01) * .3
     return np.zeros(1)
 

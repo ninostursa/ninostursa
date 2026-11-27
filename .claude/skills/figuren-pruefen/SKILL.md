@@ -12,8 +12,16 @@ description: Pflicht-Check für gezeichnete Figuren in den Patent-Future-Animati
 2. **Keine Bärte ohne Freigabe.** Neue Figuren bekommen standardmäßig keinen Bart. Ein Bart kommt nur dazu, wenn Nino
    ihn vorher auf einem Probebild freigegeben hat (bisher freigegeben: der kurze Vollbart `full` beim Papa in File 001).
    Der Bart sitzt fest am Kinn und wandert beim Seitenblick nicht mit, damit keine Hautlücke entsteht.
-3. Ganzer Körper, natürliche Arme (Ellbogen nach unten/außen), Hände mit Daumen, Figuren am Tisch sitzen ruhig.
-4. Porträts an der Wand sind auf den Rahmen beschnitten, Texte überlappen keine Symbole.
+3. **Arme nie zu lang.** Eine Hand darf nur so weit von der Schulter weg sein, wie der Arm reicht
+   (Mensch: Ober- + Unterarm je `90*s`, Roboter je `90*s`). Hängende Arme enden an der Hüfte. `lib.js` zieht zu
+   weite Hände automatisch heran; liegt das Ziel (Tisch, Tastatur, Gegenstand) außer Reichweite, die Figur oder den
+   Gegenstand näher setzen statt die Hand ins Leere greifen zu lassen.
+4. Ganzer Körper, natürliche Arme (Ellbogen nach unten/außen), Hände mit Daumen, Figuren am Tisch sitzen ruhig.
+5. Porträts an der Wand sind auf den Rahmen beschnitten, Texte überlappen keine Symbole.
+
+## Ton
+- Keine Rausch-Effekte (weißes Rauschen) als Klang für Zeit, Wind oder Ähnliches; Nino empfindet das als störend.
+  Stattdessen tonale Klänge, z. B. ticken­de Uhr und weicher, steigender Akkord für Zeitraffer.
 
 ## Ablauf
 1. Frisuren automatisch prüfen:
@@ -21,6 +29,11 @@ description: Pflicht-Check für gezeichnete Figuren in den Patent-Future-Animati
    cd animation && node tools/check-hair.js the-copy/lib.js   # bzw. lib.js der aktuellen Folge
    ```
    Jede Zeile muss `OK` sein. Danach `animation/tools/hair-check.png` ansehen (Übersicht aller Frisuren).
+   Arme prüfen (ganzes Video, alle 0,25 s):
+   ```
+   node tools/check-arms.js the-copy                          # bzw. Ordner der aktuellen Folge
+   ```
+   Muss „Alle Hände liegen in Armreichweite.“ ausgeben, sonst die gelisteten Stellen korrigieren.
 2. Bei `FEHLER`: die Vorderhaar-Kurve in `HAIR.<stil>[1]` höher ziehen (Kontrollpunkte etwa `y - 86*s`) und erneut prüfen.
 3. Nahaufnahmen prüfen: `node render.js --stills <zeiten>` für jede Szene mit einer neuen oder geänderten Figur,
    Köpfe ausschneiden und ansehen (Haaransatz, Bart, Augen, Hände).

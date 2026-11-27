@@ -94,6 +94,14 @@ function elbow(sx, sy, hx, hy, L, side) {
   const score = e => .5 * out * (e[0] - sx) + (e[1] - sy);
   return score(a) >= score(b) ? a : b;
 }
+// Hand höchstens so weit vom Schulterpunkt wie der Arm lang ist (sonst wirken die Arme gestreckt/zu lang).
+// Zu weit entfernte Ziele werden zur Schulter herangezogen und in window.ARMWARN notiert (Prüfung mit tools/check-arms.js).
+function reach(sx, sy, h, L, who = '') {
+  const dx = h[0] - sx, dy = h[1] - sy, d = Math.hypot(dx, dy), m = 2 * L * .97;
+  if (d <= m) return h;
+  if (typeof window !== 'undefined' && d > m * 1.04) (window.ARMWARN = window.ARMWARN || []).push(`${who} ${Math.round(d / m * 100)}%`);
+  return [sx + dx * m / d, sy + dy * m / d];
+}
 function armPath(sx, sy, hx, hy, L, side) {
   const [ex, ey] = elbow(sx, sy, hx, hy, L, side);
   return `M${sx} ${sy} L${ex} ${ey} L${hx} ${hy}`;
@@ -184,8 +192,8 @@ function person(o) {
   // Hals
   g += `<rect x="${x - 15 * s}" y="${n - 26 * s}" width="${30 * s}" height="${30 * s}" fill="${shade}"/>`;
   // Arme (Ärmel + Hand)
-  const L = 70 * s, shY = n + 32 * s;
-  const hL = o.hL || [x - 54 * s, n + 200 * s], hR = o.hR || [x + 54 * s, n + 200 * s];
+  const L = 90 * s, shY = n + 32 * s;   // Ober- + Unterarm = 180·s: Hand hängt bis zur Hüfte
+  const hL = reach(x - 50 * s, shY, o.hL || [x - 56 * s, n + 200 * s], L, 'person ' + (o.hair || '')), hR = reach(x + 50 * s, shY, o.hR || [x + 56 * s, n + 200 * s], L, 'person ' + (o.hair || ''));
   const drawArm = (sx, h, side) => { const [ex, ey] = elbow(sx, shY, h[0], h[1], L, side);
     return `<path d="M${sx} ${shY} L${ex} ${ey} L${h[0]} ${h[1]}" stroke="${shirtD}" stroke-width="${35 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
       <path d="M${sx} ${shY} L${ex} ${ey} L${h[0]} ${h[1]}" stroke="${shirt}" stroke-width="${29 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -263,8 +271,8 @@ function robot(o) {
     <circle cx="${x - 6 * s}" cy="${n + 84 * s}" r="${20 * s}" fill="${dark}"/>
     <circle cx="${x - 6 * s}" cy="${n + 84 * s}" r="${12 * s}" fill="${MINT}" opacity="${pw * (.6 + .4 * Math.sin(t * 3))}"/>
     <circle cx="${x - 6 * s}" cy="${n + 84 * s}" r="${36 * s}" fill="${MINT}" opacity="${pw * .16}" filter="url(#soft)"/>`;
-  const L = 78 * s, shY = n + 40 * s;
-  const hL = o.hL || [x - 62 * s, n + 196 * s], hR = o.hR || [x + 62 * s, n + 196 * s];
+  const L = 90 * s, shY = n + 40 * s;
+  const hL = reach(x - 58 * s, shY, o.hL || [x - 64 * s, n + 204 * s], L, 'robot'), hR = reach(x + 58 * s, shY, o.hR || [x + 64 * s, n + 204 * s], L, 'robot');
   const arm = (side, h) => {
     const sx = x + side * 58 * s, p = armPath(sx, shY, h[0], h[1], L, side > 0 ? -1 : 1);
     return `<path d="${p}" stroke="${shade}" stroke-width="${28 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
