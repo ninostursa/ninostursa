@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>html, body { margin: 0; background: #000; overflow: hidden; } svg { display: block; width: 1280px; height: 720px; }</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="lib.js"></script>
+<script>
+/* Testtafel: alle Frisuren × Blickrichtung (links / geradeaus / rechts), mit und ohne Bart.
+ * Prüfen: keine Haut über dem Haaransatz (Glatzenstellen), Bart folgt dem Blick. node ../thumb.js mind-reader/test-figuren.html <png> */
+const styles = ['short', 'dad', 'mom', 'lily', 'ben', 'long', 'old', 'pony', 'bald'];
+const looks = [[-12, 0], [0, 0], [12, -4]];
+let s = `<defs><filter id="soft"><feGaussianBlur stdDeviation="9"/></filter><filter id="glowS"><feGaussianBlur stdDeviation="3"/></filter></defs><rect width="1920" height="1080" fill="#22364f"/>`;
+styles.forEach((h, i) => looks.forEach((lk, j) => {
+  const x = 110 + i * 210, y = 160 + j * 330;
+  s += person({ x, neck: y + 60, s: .85, hair: h, hairCol: ['#5a3a24', '#3b2a24', '#8a5a3c', '#c0642e', '#111', '#e0b050', '#e8e8ee', '#2a1c16', '#7a6a5a'][i],
+    beard: j === 1 ? i % 2 === 0 : i % 2 === 1, look: lk, mouth: 'smile', t: 1 });
+  if (j === 0) s += text(h, x, 40, { size: 30, font: 'JetBrains Mono', weight: 800, fill: '#cfe' });
+}));
+document.getElementById('stage').innerHTML = s;
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+PATENT FUTURE · FILE 002 · THE MIND READER
+==========================================
+
+TITEL (einen auswählen)
+-----------------------
+1. This Chip Turns Your Thoughts Into Text. Tom Got Fired.      ← Empfehlung
+2. Scientists Can Now Read Your Inner Voice. There's a Catch.
+3. Could a Chip Read Your Thoughts? (It Already Reads Some)
+
+
+BESCHREIBUNG
+------------
+Tom got a chip that turns his thoughts into text. His first meeting with it was also his last.
+
+In File 002 we look at the Mind Reader: a chip that could read your thoughts. Brain implants already give people with ALS their voice back. Neuralink's first patient played chess with his mind. And in 2025, scientists decoded inner speech for the first time. So how close is real mind reading? And who owns your brain data?
+
+Chapters
+0:00 Tom's first meeting
+0:26 Already here
+1:02 The catch
+1:27 Without surgery
+1:47 Day two
+1:59 Who owns your thoughts?
+2:10 Verdict
+
+Sources
+• Speech BCI for a man with ALS (Casey Harrell), about 97% accuracy: Card et al., New England Journal of Medicine (2024), UC Davis Health
+• Neuralink's first human implant (Noland Arbaugh, January 2024); 21 participants by early 2026: company updates and trial sites, e.g. UCLH GB-PRIME study
+• Decoding inner speech, up to 74%, with a mental password ("chitty chitty bang bang"): Kunz et al., Cell (2025), Stanford University
+• Non-invasive semantic decoder from fMRI, 16 hours of training, defeated by thinking of other things: Tang et al., Nature Neuroscience (2023), UT Austin
+• Neural data privacy laws: Colorado H.B. 24-1058 (2024), California SB 1223 (2024); Chile's constitutional amendment on neurorights (2021)
+The verdict at the end is our own estimate.
+
+Would you get the chip? Tell us in the comments.
+
+#future #science #neuralink
+
+
+TAGS
+----
+mind reading, brain chip, brain computer interface, BCI, Neuralink, inner speech, thought to text, neurotechnology, neural data, neurorights, ALS, future technology, science explained, what if, animated explainer, Patent Future
+
+
+ANGEPINNTER KOMMENTAR
+---------------------
+If a chip could turn your thoughts into text, which thought would you be most afraid it writes down? 👀
+
+
+EINSTELLUNGEN BEIM HOCHLADEN
+----------------------------
+• Kategorie: Wissenschaft & Technik · Nicht speziell für Kinder · Sprache: Englisch
+• Veränderte oder synthetische Inhalte: Ja (KI-Stimmen)
+• Untertitel: subtitles_en.srt hochladen
+• Playlist: Patent Future Files · Endbildschirm: letzte 10 Sekunden
+• Video-Dateiname vor dem Hochladen: mind-reader.mp4

@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>html, body { margin: 0; padding: 0; background: transparent; overflow: hidden; } svg { display: block; }</style>
+</head>
+<body>
+<svg id="stage" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="lib.js"></script>
+<script src="scenes.js"></script>
+<script>
+/* Ebenen für den Short (9:16, 1080x1920). ?mode=bg | hook | end | cap&text=...
+ * Wird von make-short.js als PNGs gerendert und mit ffmpeg zusammengesetzt. */
+const q = new URLSearchParams(location.search), mode = q.get('mode');
+const SW = 1080, SH = mode === 'cap' ? 300 : 1920;
+const DEFS = `<defs>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+  <filter id="glow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="22"/></filter>
+  <filter id="glowS" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  <radialGradient id="bgR" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#17465a"/><stop offset=".6" stop-color="#0c2433"/><stop offset="1" stop-color="#06121c"/></radialGradient>
+</defs>`;
+
+function background() {
+  let s = `<rect width="${SW}" height="${SH}" fill="url(#bgR)"/>`;
+  for (let x = 0; x <= SW; x += 60) s += `<line x1="${x}" y1="0" x2="${x}" y2="${SH}" stroke="${MINT}" stroke-opacity=".05" stroke-width="2"/>`;
+  for (let y = 0; y <= SH; y += 60) s += `<line x1="0" y1="${y}" x2="${SW}" y2="${y}" stroke="${MINT}" stroke-opacity=".05" stroke-width="2"/>`;
+  const R = rng(9);
+  for (let i = 0; i < 30; i++) s += `<circle cx="${R() * SW}" cy="${R() * SH}" r="${2 + R() * 4}" fill="#fff3dd" opacity="${.08 + R() * .2}" filter="url(#soft)"/>`;
+  return s;
+}
+const fileTag = (y) => `<g transform="translate(${SW / 2} ${y})"><rect x="-150" y="-34" width="300" height="68" rx="14" fill="#08121b" opacity=".85" stroke="${MINT}" stroke-width="4"/>
+  ${text('FILE 002', 0, 2, { size: 36, weight: 800, font: 'JetBrains Mono', fill: MINT, ls: 4 })}</g>`;
+// Text mit festem dunklem Rand (gut lesbar über jedem Bild)
+const bold = (str, x, y, size, fill, glow) => (glow ? text(str, x, y, { size, fill: glow, glow, op: .9 }) : '') +
+  `<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="middle" font-family="Inter" font-weight="900" font-size="${size}" fill="${fill}" stroke="#08121b" stroke-width="${size * .2}" stroke-linejoin="round" paint-order="stroke">${esc(str)}</text>`;
+
+function hook() {
+  return fileTag(62) + bold('IT TYPES WHAT YOU THINK.', SW / 2, 158, 66, '#fff') + bold('WHAT COULD GO WRONG?', SW / 2, 258, 70, MINT, MINT);
+}
+function caption() {
+  const lines = q.get('text').split('|');
+  return lines.map((l, i) => bold(l, SW / 2, 150 + (i - (lines.length - 1) / 2) * 84, 66, '#fff')).join('');
+}
+function endCard() {
+  let s = background();
+  s += `<g transform="translate(${SW / 2} 330)"><rect x="-250" y="-46" width="500" height="92" rx="16" fill="none" stroke="${MINT}" stroke-width="5"/>
+    ${text('PATENT FUTURE', 0, 3, { size: 52, fill: MINT, ls: 3 })}</g>`;
+  s += text('FILE 002', SW / 2, 450, { size: 44, weight: 800, font: 'JetBrains Mono', fill: '#d9f7ee', ls: 8 });
+  s += text('THE MIND', SW / 2, 580, { size: 130, fill: '#fff', glow: MINT });
+  s += text('READER', SW / 2, 715, { size: 130, fill: '#fff', glow: MINT });
+  s += person({ x: SW / 2, neck: 930, s: 1.0, legs: 'stand', foot: 1370, ...TOM, hat: chipAt(1), t: 1, look: [0, 0], mouth: 'grin', brows: 'up' });
+  // Aufruf zum ganzen Video
+  s += `<g transform="translate(${SW / 2} 1480)"><rect x="-370" y="-56" width="740" height="112" rx="56" fill="${CORAL}"/>
+    <path d="M-300 -24 L-262 0 L-300 24 Z" fill="#fff"/>
+    ${text('WATCH THE FULL FILE', 30, 3, { size: 52, fill: '#fff' })}</g>`;
+  s += text('Link below', SW / 2, 1585, { size: 38, weight: 800, font: 'JetBrains Mono', fill: '#d9f7ee', ls: 2 });
+  return s;
+}
+
+const svg = document.getElementById('stage');
+svg.setAttribute('viewBox', `0 0 ${SW} ${SH}`); svg.setAttribute('width', SW); svg.setAttribute('height', SH);
+svg.innerHTML = DEFS + ({ bg: background, hook, cap: caption, end: endCard }[mode])();
+</script>
+</body>
+</html>

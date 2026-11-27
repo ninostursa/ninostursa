@@ -216,9 +216,16 @@ function person(o) {
     sad: `<path d="M${mx - 13 * s} ${my + 6 * s} Q ${mx} ${my - 6 * s} ${mx + 13 * s} ${my + 6 * s}" stroke="#7a2e2e" stroke-width="${4.5 * s}" fill="none" stroke-linecap="round"/>`,
     talk: `<ellipse cx="${mx}" cy="${my + 2 * s}" rx="${11 * s}" ry="${(3 + 6 * Math.abs(Math.sin((o.t || 0) * 14))) * s}" fill="#7a2e2e"/>`,
   };
+  // Bart: wandert mit der Blickrichtung mit (wie Augen und Mund), bleibt innerhalb der Kopfform, liegt unter dem Mund
+  if (o.beard) {
+    const cid = 'bc' + Math.round(x * 7 + n * 3 + s * 100);
+    face += `<clipPath id="${cid}"><ellipse cx="${x}" cy="${hy}" rx="${50 * s}" ry="${58 * s}"/></clipPath>
+      <g clip-path="url(#${cid})">${HAIR.beard[1](x + ldx * s * .75, hy + ldy * s * .5, s, hc)}</g>`;
+  }
   face += mouths[o.mouth || 'smile'];
   if (o.age) face += `<path d="M${ex - 34 * s} ${ey + 4 * s} l -8 4 M${ex + 34 * s} ${ey + 4 * s} l 8 4 M${mx - 22 * s} ${my - 6 * s} q -4 8 2 14 M${mx + 22 * s} ${my - 6 * s} q 4 8 -2 14" stroke="${shade}" stroke-width="${3 * s}" fill="none" opacity="${o.age}" stroke-linecap="round"/>`;
-  if (o.beard) face += HAIR.beard[1](x, hy, s, hc);
+  // Haarkappe: schließt den Scheitel, damit bei keiner Frisur Haut oben durchblitzt (keine "Glatzenstellen")
+  if ((o.hair || 'short') !== 'bald') face += `<path d="M${x - 40 * s} ${hy - 34 * s} C ${x - 46 * s} ${hy - 72 * s}, ${x + 46 * s} ${hy - 72 * s}, ${x + 40 * s} ${hy - 34 * s} Z" fill="${hc}"/>`;
   face += hairs[1](x, hy, s, hc);
   if (o.glasses) face += `<g stroke="#1a1420" stroke-width="${3.5 * s}" fill="#fff" fill-opacity=".12"><circle cx="${ex - 18 * s}" cy="${ey}" r="${15 * s}"/><circle cx="${ex + 18 * s}" cy="${ey}" r="${15 * s}"/><line x1="${ex - 3 * s}" y1="${ey}" x2="${ex + 3 * s}" y2="${ey}"/></g>`;
   if (o.hat) face += o.hat(x, hy, s);

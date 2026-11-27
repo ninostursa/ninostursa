@@ -4,7 +4,7 @@
 **Neue Figur:** Tom, Büroangestellter Anfang 30. Dazu sein Chef (Meeting) und eine Interviewerin (Vorstellungsgespräch).
 **Roter Faden (Objekt in der Ecke):** ein **Vorhängeschloss** → „Es gibt einen Gedanken, den Tom niemals denken darf.“
 **Auflösung:** Es ist sein Gedanken-Passwort, das den Chip entsperrt: „I love Mondays.“
-**Gag:** Im Vorstellungsgespräch schreibt der Chip Toms Ohrwurm mit, den Werbespruch „Crunchy Bits“ aus File 001 (kleines Easter Egg).
+**Gag:** Im Vorstellungsgespräch kommt die Frage „Wo sehen Sie sich in fünf Jahren?“, und der Chip schreibt Toms ehrliche Antwort mit: „In your chair.“
 
 Stimmen: N = Erzähler (Jarnathan), T = Tom (neue Stimme, noch auszuwählen)
 
@@ -26,9 +26,9 @@ Stimmen: N = Erzähler (Jarnathan), T = Tom (neue Stimme, noch auszuwählen)
 | s14 | N | What about without surgery? In Texas, volunteers lay in a brain scanner for sixteen hours, listening to stories. | Etikett TEXAS · 2023, Scanner, Uhr läuft |
 | s15 | N | Then an AI guessed what they were hearing, and even what they imagined. Not word for word. But the gist. | Satz vs. ungefähre Version |
 | s16 | N | The weak spot? It only worked on people who trained it. And anyone could beat it. Just think about animals. | Gedanken voller Tiere, Text wird Unsinn |
-| s17 | N | Tom's second day with the chip. A job interview. Just think something smart, Tom. | Vorstellungsgespräch |
-| s18 | T | Crunchy Bits! Now with extra crunch! | Leinwand tippt mit, Interviewerin starrt |
-| s19 | N | Earworms. The chip writes those down too. | |
+| s17 | N | Tom's second day with the chip. A job interview. And the classic question: where do you see yourself in five years? | Vorstellungsgespräch, Interviewerin lächelt |
+| s18 | T | In your chair. | Bildschirm tippt mit, Interviewerin erstarrt |
+| s19 | N | Some thoughts should stay thoughts. | Tom lächelt verlegen |
 | s20 | N | So who owns your brain data? In 2024, Colorado became the first US state to protect it by law. California followed. Chile even wrote neurorights into its constitution. | Etikett COLORADO · 2024, Gesetzesstempel |
 | s21 | N | Our verdict. Chips that give people their voice back: already here, and getting better fast. A chip that reads your inner voice, every day, for everyone? Maybe in twenty years. Reading thoughts you want to keep? We hope never. That is our own estimate. | Urteil, Zeitstrahl |
 | s22 | N | And if it works? Messages you just think. Silent phone calls. Meetings where nobody says a word. Tom would love that. | Zeitraffer/Ausblick |
