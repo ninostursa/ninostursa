@@ -118,6 +118,11 @@ const HAIR = {
       <path d="M${x + 14 * s} ${y - 66 * s} C ${x + 28 * s} ${y - 62 * s}, ${x + 40 * s} ${y - 52 * s}, ${x + 46 * s} ${y - 38 * s}" stroke="${mix(c, '#ffffff', .15)}" stroke-width="${3.5 * s}" fill="none" stroke-linecap="round" opacity=".6"/>
       <rect x="${x - 52 * s}" y="${y - 6 * s}" width="${7 * s}" height="${20 * s}" rx="${3 * s}" fill="${c}"/><rect x="${x + 45 * s}" y="${y - 6 * s}" width="${7 * s}" height="${20 * s}" rx="${3 * s}" fill="${c}"/>`],
   beard: [(x, y, s, c) => '', (x, y, s, c) => `<path d="M${x - 47 * s} ${y + 4 * s} C ${x - 46 * s} ${y + 50 * s}, ${x - 20 * s} ${y + 60 * s}, ${x} ${y + 60 * s} C ${x + 20 * s} ${y + 60 * s}, ${x + 46 * s} ${y + 50 * s}, ${x + 47 * s} ${y + 4 * s} C ${x + 40 * s} ${y + 38 * s}, ${x + 22 * s} ${y + 48 * s}, ${x} ${y + 48 * s} C ${x - 22 * s} ${y + 48 * s}, ${x - 40 * s} ${y + 38 * s}, ${x - 47 * s} ${y + 4 * s} Z" fill="${c}" opacity=".75"/>`],
+  // Bart-Varianten (o.beard = 'stubble' | 'moustache' | 'full')
+  stubble: (x, y, s, c) => `<path d="M${x - 49 * s} ${y + 2 * s} C ${x - 44 * s} ${y + 54 * s}, ${x - 18 * s} ${y + 62 * s}, ${x} ${y + 62 * s} C ${x + 18 * s} ${y + 62 * s}, ${x + 44 * s} ${y + 54 * s}, ${x + 49 * s} ${y + 2 * s} C ${x + 36 * s} ${y + 14 * s}, ${x + 28 * s} ${y + 24 * s}, ${x + 22 * s} ${y + 28 * s} C ${x + 10 * s} ${y + 24 * s}, ${x - 10 * s} ${y + 24 * s}, ${x - 22 * s} ${y + 28 * s} C ${x - 28 * s} ${y + 24 * s}, ${x - 36 * s} ${y + 14 * s}, ${x - 49 * s} ${y + 2 * s} Z" fill="${c}" opacity=".28"/>`,
+  moustache: (x, y, s, c) => `<path d="M${x - 22 * s} ${y + 30 * s} C ${x - 16 * s} ${y + 20 * s}, ${x - 4 * s} ${y + 20 * s}, ${x} ${y + 24 * s} C ${x + 4 * s} ${y + 20 * s}, ${x + 16 * s} ${y + 20 * s}, ${x + 22 * s} ${y + 30 * s} C ${x + 12 * s} ${y + 28 * s}, ${x + 4 * s} ${y + 29 * s}, ${x} ${y + 29 * s} C ${x - 4 * s} ${y + 29 * s}, ${x - 12 * s} ${y + 28 * s}, ${x - 22 * s} ${y + 30 * s} Z" fill="${c}"/>`,
+  full: (x, y, s, c) => `<path d="M${x - 49 * s} ${y + 2 * s} C ${x - 46 * s} ${y + 56 * s}, ${x - 18 * s} ${y + 66 * s}, ${x} ${y + 66 * s} C ${x + 18 * s} ${y + 66 * s}, ${x + 46 * s} ${y + 56 * s}, ${x + 49 * s} ${y + 2 * s} C ${x + 40 * s} ${y + 16 * s}, ${x + 30 * s} ${y + 24 * s}, ${x + 22 * s} ${y + 26 * s} C ${x + 12 * s} ${y + 20 * s}, ${x - 12 * s} ${y + 20 * s}, ${x - 22 * s} ${y + 26 * s} C ${x - 30 * s} ${y + 24 * s}, ${x - 40 * s} ${y + 16 * s}, ${x - 49 * s} ${y + 2 * s} Z" fill="${c}" opacity=".92"/>
+      <ellipse cx="${x}" cy="${y + 36 * s}" rx="${15 * s}" ry="${8 * s}" fill="${mix(c, '#f2c6a0', .55)}" opacity=".9"/>`,
   mom: [
     (x, y, s, c) => `<path d="M${x - 62 * s} ${y + 46 * s} C ${x - 78 * s} ${y - 40 * s}, ${x - 40 * s} ${y - 80 * s}, ${x} ${y - 78 * s} C ${x + 40 * s} ${y - 80 * s}, ${x + 78 * s} ${y - 40 * s}, ${x + 62 * s} ${y + 46 * s} Z" fill="${c}"/>`,
     (x, y, s, c) => `<path d="M${x - 54 * s} ${y + 4 * s} C ${x - 58 * s} ${y - 60 * s}, ${x + 20 * s} ${y - 82 * s}, ${x + 54 * s} ${y - 20 * s} C ${x + 30 * s} ${y - 40 * s}, ${x - 10 * s} ${y - 30 * s}, ${x - 30 * s} ${y - 40 * s} C ${x - 40 * s} ${y - 20 * s}, ${x - 46 * s} ${y - 8 * s}, ${x - 54 * s} ${y + 4 * s} Z" fill="${c}"/>`],
@@ -206,7 +211,7 @@ function person(o) {
   const brow = { neutral: [0, 0], up: [-8, -8], worried: [6, -6], angry: [-6, 6], sad: [6, -4] }[bw] || [0, 0];
   face += `<path d="M${ex - 28 * s} ${by + brow[0] * s * .3} L${ex - 9 * s} ${by + brow[1] * s * .5 - 2 * s}" stroke="${bc}" stroke-width="${5 * s}" stroke-linecap="round"/>
     <path d="M${ex + 9 * s} ${by + brow[1] * s * .5 - 2 * s} L${ex + 28 * s} ${by + brow[0] * s * .3}" stroke="${bc}" stroke-width="${5 * s}" stroke-linecap="round"/>`;
-  if (o.beard) face += HAIR.beard[1](x, hy, s, mix(hc, o.skin || '#f2c6a0', .25));
+  if (o.beard) face += (HAIR[o.beard] || HAIR.beard[1])(ex - x + x, hy - 2 * s + (o.look || [0, 0])[1] * s, s, typeof o.beard === 'string' ? hc : mix(hc, o.skin || '#f2c6a0', .25));
   // Nase
   face += `<path d="M${ex + 2 * s} ${ey + 8 * s} Q ${ex + 8 * s} ${ey + 20 * s} ${ex} ${ey + 22 * s}" stroke="${shade}" stroke-width="${4 * s}" fill="none" stroke-linecap="round"/>`;
   // Mund
