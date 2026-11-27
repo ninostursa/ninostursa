@@ -47,7 +47,7 @@ function frames(n, hl = 0) {
 }
 function miniFace(who) {
   const cfg = { dad: ['dad', '#3b2a24', '#f2c6a0', CORAL], mom: ['mom', '#8a5a3c', '#f6d1b0', '#3fae7a'], a: ['short', '#222', '#c98d64', '#4cc9f0'], b: ['long', '#e0b050', '#f6d1b0', '#b07cff'], c: ['ben', '#5a3a2a', '#e8b48c', SUN], d: ['pony', '#222', '#8d5a3c', CORAL] }[who] || ['short', '#333', '#f2c6a0', '#888'];
-  return person({ x: 0, neck: 76, hair: cfg[0], hairCol: cfg[1], skin: cfg[2], shirt: cfg[3], beard: who === 'dad', mouth: 'smile' });
+  return person({ x: 0, neck: 76, hair: cfg[0], hairCol: cfg[1], skin: cfg[2], shirt: cfg[3], beard: who === 'dad' ? 'full' : false, mouth: 'smile' });
 }
 function plant(k) {
   const sc = lerp(.9, 2.0, k); let l = '';
@@ -308,7 +308,7 @@ function sceneChat(t) {
   // Joshua am Schreibtisch, vom Bildschirm angeleuchtet
   s += `<ellipse cx="560" cy="560" rx="420" ry="300" fill="${MINT}" opacity=".10" filter="url(#glow)"/>`;
   const typing = (t * 3) % 1 < .5;
-  s += person({ x: 560, neck: 560, s: 1.15, hair: 'short', hairCol: '#2a1c16', skin: '#f0c4a0', shirt: '#3a4256', beard: true, t,
+  s += person({ x: 560, neck: 560, s: 1.15, hair: 'short', hairCol: '#2a1c16', skin: '#f0c4a0', shirt: '#3a4256', beard: 'stubble', t,
     look: [10, 6], mouth: t > F('s05', .78) ? 'smile' : 'flat', brows: t < F('s05', .5) ? 'worried' : 'neutral', blink: blinkAt(t, 2),
     hL: [470, 850 + (typing ? -6 : 0)], hR: [650, 850 + (typing ? 0 : -6)] });
   s += `<rect x="120" y="850" width="900" height="40" rx="10" fill="#4a3a5a"/><rect x="140" y="890" width="860" height="200" fill="#2a2040"/>
@@ -558,7 +558,7 @@ function sceneLab(t) {
     return `<path d="M${x - 66 * sc} ${hy - 4 * sc} A ${66 * sc} ${66 * sc} 0 0 1 ${x + 66 * sc} ${hy - 4 * sc} Z" fill="#cfd8e3"/><rect x="${x - 72 * sc}" y="${hy - 14 * sc}" width="${144 * sc}" height="${18 * sc}" rx="8" fill="#8796a8"/>
       ${[-1, 0, 1].map(i => `<circle cx="${x + i * 28 * sc}" cy="${hy - 50 * sc}" r="${8 * sc}" fill="${MINT}" opacity="${on}"/>`).join('')}`;
   };
-  s += person({ x: MX, neck: 560, s: 1.05, legs: 'sit', foot: FLOOR, hair: 'dad', hairCol: '#3b2a24', beard: true, shirt: CORAL, pants: '#2d3a5a', t,
+  s += person({ x: MX, neck: 560, s: 1.05, legs: 'sit', foot: FLOOR, hair: 'dad', hairCol: '#3b2a24', beard: 'full', shirt: CORAL, pants: '#2d3a5a', t,
     look: surprised ? [12, 0] : (scanK > 0 ? [0, -6] : [4, 0]), mouth: surprised ? 'o' : (scanK > 0 ? 'flat' : 'smile'), brows: surprised ? 'up' : (scanK > 0 ? 'worried' : 'neutral'),
     blink: blinkAt(t, 0), hL: [MX - 46, 792], hR: [MX + 46, 792], sweat: scanK > .2 && scanK < .7 ? prog(scanK, .2, .7) : 0, hat: t < F('s13', .5) ? helmet : null });
   // Fortschritt
@@ -604,7 +604,7 @@ function sceneTest2(t) {
   let s = bgGrad('t2', '#06121c', '#10283a') + grid(.035);
   s += testCard(2, 'CHANGE', t, S('s15') + .05);
   // Mensch links: lernt, vergisst, ändert Meinung
-  s += person({ x: 560, neck: 460, s: 1.05, legs: 'stand', foot: 1020, hair: 'dad', hairCol: '#3b2a24', beard: true, shirt: CORAL, t,
+  s += person({ x: 560, neck: 460, s: 1.05, legs: 'stand', foot: 1020, hair: 'dad', hairCol: '#3b2a24', beard: 'full', shirt: CORAL, t,
     look: [0, -6], mouth: 'smile', blink: blinkAt(t, 0), hL: [470, 640], hR: [650, 640],
     item: (x, y) => prog(t, F('s15', .2), F('s15', .25)) > 0 ? `<g transform="translate(${x - 90} ${y - 30})"><rect x="0" y="0" width="80" height="100" rx="6" fill="#4c6ef5"/><rect x="80" y="0" width="80" height="100" rx="6" fill="#5c7cff"/><line x1="80" y1="0" x2="80" y2="100" stroke="#fff" stroke-width="4"/></g>` : '' });
   const icon = (x, y, f, inner) => { const k = back(prog(t, F('s15', f), F('s15', f) + .3)); return k > 0 ? `<g transform="translate(${x} ${y}) scale(${k})">${inner}</g>` : ''; };
@@ -647,7 +647,7 @@ function sceneTwoDads(t) {
   if (point > 0) { dadHR = [lerp(760, 900, point), lerp(760, 560, point)]; botHL = [lerp(1158, 1020, point), lerp(756, 560, point)]; }
   const grab = Math.max(keysK, pizzaK);
   if (grab > 0) { dadHR = [lerp(dadHR[0], 930 + tug, grab), lerp(dadHR[1], midY, grab)]; botHL = [lerp(botHL[0], 990 + tug, grab), lerp(botHL[1], midY, grab)]; }
-  s += person({ x: 700, neck: 440, s: 1.05, legs: 'stand', foot: 1000, hair: 'dad', hairCol: '#3b2a24', beard: true, shirt: CORAL, t,
+  s += person({ x: 700, neck: 440, s: 1.05, legs: 'stand', foot: 1000, hair: 'dad', hairCol: '#3b2a24', beard: 'full', shirt: CORAL, t,
     look: look ? [12, 0] : [0, 0], mouth: point > 0 || grab > 0 ? 'open' : (look ? 'o' : 'smile'), brows: grab > 0 || point > 0 ? 'angry' : 'up', blink: blinkAt(t, 0), hR: dadHR });
   s += robot({ x: 1220, neck: 450, t, legs: 'stand', foot: 1000, look: look ? [-10, 0] : [0, 0], eyes: 'on', mouth: point > 0 || grab > 0 ? 'talk' : 'o', hL: botHL });
   if (keysK > 0) s += `<g transform="translate(${960 + tug} ${midY}) scale(${keysK})"><circle cx="0" cy="-20" r="26" fill="none" stroke="${SUN}" stroke-width="10"/><rect x="-8" y="0" width="16" height="70" rx="6" fill="${SUN}"/><rect x="8" y="40" width="20" height="10" fill="${SUN}"/><rect x="8" y="58" width="14" height="10" fill="${SUN}"/></g>`;
