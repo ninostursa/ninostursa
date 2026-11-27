@@ -194,7 +194,7 @@ function sceneCasey(t) {
   const sensorsK = prog(t, F('s06', .68), F('s06', .74));
   const happy = t > S('s08');
   s += wheelchair(CX);
-  s += person({ x: CX, neck: n, legs: 'sit', foot: FLOOR - 40, hair: 'short', hairCol: '#6b4a2e', beard: true, skin: '#f0c8a6', shirt: '#5a7fa6', pants: '#34405a', t,
+  s += person({ x: CX, neck: n, legs: 'sit', foot: FLOOR - 40, hair: 'short', hairCol: '#6b4a2e', skin: '#f0c8a6', shirt: '#5a7fa6', pants: '#34405a', t,
     look: t > F('s07', .4) ? [12, -2] : [4, 0], mouth: happy ? 'smile' : 'flat', brows: t < F('s06', .5) ? 'sad' : 'neutral', blink: blinkAt(t, 4),
     hL: [CX - 64, n + 212], hR: [CX + 64, n + 212], hat: sensorsK > 0 ? pedestals : null });
   s += wheels(CX);
