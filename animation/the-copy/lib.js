@@ -94,6 +94,14 @@ function elbow(sx, sy, hx, hy, L, side) {
   const score = e => .5 * out * (e[0] - sx) + (e[1] - sy);
   return score(a) >= score(b) ? a : b;
 }
+// Hand höchstens so weit vom Schulterpunkt wie der Arm lang ist (sonst wirken die Arme gestreckt/zu lang).
+// Zu weit entfernte Ziele werden zur Schulter herangezogen und in window.ARMWARN notiert (Prüfung mit tools/check-arms.js).
+function reach(sx, sy, h, L, who = '') {
+  const dx = h[0] - sx, dy = h[1] - sy, d = Math.hypot(dx, dy), m = 2 * L * .97;
+  if (d <= m) return h;
+  if (typeof window !== 'undefined' && d > m * 1.04) (window.ARMWARN = window.ARMWARN || []).push(`${who} ${Math.round(d / m * 100)}%`);
+  return [sx + dx * m / d, sy + dy * m / d];
+}
 function armPath(sx, sy, hx, hy, L, side) {
   const [ex, ey] = elbow(sx, sy, hx, hy, L, side);
   return `M${sx} ${sy} L${ex} ${ey} L${hx} ${hy}`;
@@ -110,33 +118,42 @@ function hand(hx, hy, ex, ey, r, skin, side) {
 
 const HAIR = {
   // jeweils [hinten, vorne] als Funktion (x, hy Kopfmitte, s, Farbe)
-  dad: [
+  dad: [   // gepflegter Kurzhaarschnitt mit Seitenscheitel und etwas Volumen vorne
     (x, y, s, c) => '',
-    (x, y, s, c) => `<path d="M${x - 50 * s} ${y - 6 * s} C ${x - 54 * s} ${y - 62 * s}, ${x + 50 * s} ${y - 76 * s}, ${x + 52 * s} ${y - 10 * s} C ${x + 40 * s} ${y - 34 * s}, ${x + 10 * s} ${y - 40 * s}, ${x - 8 * s} ${y - 36 * s} C ${x - 26 * s} ${y - 34 * s}, ${x - 40 * s} ${y - 24 * s}, ${x - 50 * s} ${y - 6 * s} Z" fill="${c}"/>
-      <path d="M${x + 4 * s} ${y - 56 * s} C ${x - 4 * s} ${y - 92 * s}, ${x + 36 * s} ${y - 96 * s}, ${x + 30 * s} ${y - 72 * s} C ${x + 26 * s} ${y - 62 * s}, ${x + 14 * s} ${y - 70 * s}, ${x + 18 * s} ${y - 78 * s}" stroke="${c}" stroke-width="${9 * s}" fill="none" stroke-linecap="round"/>`],
-  beard: [(x, y, s, c) => '', (x, y, s, c) => `<path d="M${x - 46 * s} ${y + 6 * s} C ${x - 44 * s} ${y + 60 * s}, ${x + 44 * s} ${y + 60 * s}, ${x + 46 * s} ${y + 6 * s} C ${x + 36 * s} ${y + 36 * s}, ${x - 36 * s} ${y + 36 * s}, ${x - 46 * s} ${y + 6 * s} Z" fill="${c}" opacity=".9"/>`],
+    (x, y, s, c) => `<path d="M${x - 53 * s} ${y + 8 * s} C ${x - 60 * s} ${y - 46 * s}, ${x - 34 * s} ${y - 76 * s}, ${x + 2 * s} ${y - 75 * s} C ${x + 40 * s} ${y - 75 * s}, ${x + 62 * s} ${y - 48 * s}, ${x + 53 * s} ${y + 6 * s} L${x + 47 * s} ${y - 8 * s} C ${x + 44 * s} ${y - 28 * s}, ${x + 32 * s} ${y - 38 * s}, ${x + 14 * s} ${y - 40 * s} C ${x - 6 * s} ${y - 34 * s}, ${x - 30 * s} ${y - 38 * s}, ${x - 44 * s} ${y - 20 * s} L${x - 46 * s} ${y + 8 * s} Z" fill="${c}"/>
+      <path d="M${x - 40 * s} ${y - 30 * s} C ${x - 30 * s} ${y - 58 * s}, ${x + 6 * s} ${y - 66 * s}, ${x + 36 * s} ${y - 44 * s} C ${x + 16 * s} ${y - 50 * s}, ${x - 14 * s} ${y - 48 * s}, ${x - 40 * s} ${y - 30 * s} Z" fill="${mix(c, '#000000', .25)}" opacity=".6"/>
+      <path d="M${x - 10 * s} ${y - 72 * s} C ${x - 18 * s} ${y - 62 * s}, ${x - 26 * s} ${y - 52 * s}, ${x - 30 * s} ${y - 42 * s}" stroke="${mix(c, '#ffffff', .22)}" stroke-width="${4 * s}" fill="none" stroke-linecap="round" opacity=".8"/>
+      <path d="M${x + 14 * s} ${y - 66 * s} C ${x + 28 * s} ${y - 62 * s}, ${x + 40 * s} ${y - 52 * s}, ${x + 46 * s} ${y - 38 * s}" stroke="${mix(c, '#ffffff', .15)}" stroke-width="${3.5 * s}" fill="none" stroke-linecap="round" opacity=".6"/>
+      <rect x="${x - 52 * s}" y="${y - 6 * s}" width="${7 * s}" height="${20 * s}" rx="${3 * s}" fill="${c}"/><rect x="${x + 45 * s}" y="${y - 6 * s}" width="${7 * s}" height="${20 * s}" rx="${3 * s}" fill="${c}"/>`],
+  beard: [(x, y, s, c) => '', (x, y, s, c) => `<path d="M${x - 47 * s} ${y + 4 * s} C ${x - 46 * s} ${y + 50 * s}, ${x - 20 * s} ${y + 60 * s}, ${x} ${y + 60 * s} C ${x + 20 * s} ${y + 60 * s}, ${x + 46 * s} ${y + 50 * s}, ${x + 47 * s} ${y + 4 * s} C ${x + 40 * s} ${y + 38 * s}, ${x + 22 * s} ${y + 48 * s}, ${x} ${y + 48 * s} C ${x - 22 * s} ${y + 48 * s}, ${x - 40 * s} ${y + 38 * s}, ${x - 47 * s} ${y + 4 * s} Z" fill="${c}" opacity=".75"/>`],
+  // Bart-Varianten (o.beard = 'stubble' | 'moustache' | 'full'); x/y = Kopfmitte (fest), mx = Mund-x (folgt dem Blick)
+  stubble: (x, y, s, c, mx = x) => `<path d="M${x - 50 * s} ${y + 2 * s} C ${x - 46 * s} ${y + 56 * s}, ${x - 18 * s} ${y + 64 * s}, ${x} ${y + 64 * s} C ${x + 18 * s} ${y + 64 * s}, ${x + 46 * s} ${y + 56 * s}, ${x + 50 * s} ${y + 2 * s} C ${x + 36 * s} ${y + 16 * s}, ${x + 26 * s} ${y + 24 * s}, ${x} ${y + 26 * s} C ${x - 26 * s} ${y + 24 * s}, ${x - 36 * s} ${y + 16 * s}, ${x - 50 * s} ${y + 2 * s} Z" fill="${c}" opacity=".28"/>`,
+  moustache: (x, y, s, c, mx = x) => `<path d="M${mx - 22 * s} ${y + 30 * s} C ${mx - 16 * s} ${y + 20 * s}, ${mx - 4 * s} ${y + 20 * s}, ${mx} ${y + 24 * s} C ${mx + 4 * s} ${y + 20 * s}, ${mx + 16 * s} ${y + 20 * s}, ${mx + 22 * s} ${y + 30 * s} C ${mx + 12 * s} ${y + 28 * s}, ${mx + 4 * s} ${y + 29 * s}, ${mx} ${y + 29 * s} C ${mx - 4 * s} ${y + 29 * s}, ${mx - 12 * s} ${y + 28 * s}, ${mx - 22 * s} ${y + 30 * s} Z" fill="${c}"/>`,
+  full: (x, y, s, c, mx = x) => `<path d="M${x - 50 * s} ${y - 2 * s} C ${x - 48 * s} ${y + 56 * s}, ${x - 18 * s} ${y + 68 * s}, ${x} ${y + 68 * s} C ${x + 18 * s} ${y + 68 * s}, ${x + 48 * s} ${y + 56 * s}, ${x + 50 * s} ${y - 2 * s} C ${x + 44 * s} ${y + 12 * s}, ${x + 34 * s} ${y + 22 * s}, ${x + 22 * s} ${y + 24 * s} C ${x + 12 * s} ${y + 18 * s}, ${x - 12 * s} ${y + 18 * s}, ${x - 22 * s} ${y + 24 * s} C ${x - 34 * s} ${y + 22 * s}, ${x - 44 * s} ${y + 12 * s}, ${x - 50 * s} ${y - 2 * s} Z" fill="${c}" opacity=".92"/>
+      <ellipse cx="${mx}" cy="${y + 36 * s}" rx="${15 * s}" ry="${8 * s}" fill="${mix(c, '#f2c6a0', .55)}" opacity=".9"/>`,
   mom: [
     (x, y, s, c) => `<path d="M${x - 62 * s} ${y + 46 * s} C ${x - 78 * s} ${y - 40 * s}, ${x - 40 * s} ${y - 80 * s}, ${x} ${y - 78 * s} C ${x + 40 * s} ${y - 80 * s}, ${x + 78 * s} ${y - 40 * s}, ${x + 62 * s} ${y + 46 * s} Z" fill="${c}"/>`,
-    (x, y, s, c) => `<path d="M${x - 54 * s} ${y + 4 * s} C ${x - 58 * s} ${y - 60 * s}, ${x + 20 * s} ${y - 82 * s}, ${x + 54 * s} ${y - 20 * s} C ${x + 30 * s} ${y - 40 * s}, ${x - 10 * s} ${y - 30 * s}, ${x - 30 * s} ${y - 40 * s} C ${x - 40 * s} ${y - 20 * s}, ${x - 46 * s} ${y - 8 * s}, ${x - 54 * s} ${y + 4 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 54 * s} ${y + 4 * s} C ${x - 60 * s} ${y - 78 * s}, ${x + 30 * s} ${y - 96 * s}, ${x + 54 * s} ${y - 20 * s} C ${x + 30 * s} ${y - 40 * s}, ${x - 10 * s} ${y - 30 * s}, ${x - 30 * s} ${y - 40 * s} C ${x - 40 * s} ${y - 20 * s}, ${x - 46 * s} ${y - 8 * s}, ${x - 54 * s} ${y + 4 * s} Z" fill="${c}"/>`],
   lily: [
-    (x, y, s, c) => `<circle cx="${x - 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/><circle cx="${x + 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/>
+    (x, y, s, c) => `<ellipse cx="${x}" cy="${y - 6 * s}" rx="${55 * s}" ry="${62 * s}" fill="${c}"/><circle cx="${x - 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/><circle cx="${x + 62 * s}" cy="${y - 10 * s}" r="${22 * s}" fill="${c}"/>
       <rect x="${x - 70 * s}" y="${y - 32 * s}" width="${14 * s}" height="${8 * s}" rx="3" fill="${CORAL}"/><rect x="${x + 56 * s}" y="${y - 32 * s}" width="${14 * s}" height="${8 * s}" rx="3" fill="${CORAL}"/>`,
-    (x, y, s, c) => `<path d="M${x - 50 * s} ${y - 2 * s} C ${x - 56 * s} ${y - 70 * s}, ${x + 56 * s} ${y - 70 * s}, ${x + 50 * s} ${y - 2 * s} C ${x + 44 * s} ${y - 30 * s}, ${x + 20 * s} ${y - 26 * s}, ${x + 10 * s} ${y - 36 * s} C ${x - 4 * s} ${y - 24 * s}, ${x - 30 * s} ${y - 30 * s}, ${x - 50 * s} ${y - 2 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 54 * s} ${y + 6 * s} C ${x - 62 * s} ${y - 88 * s}, ${x + 62 * s} ${y - 88 * s}, ${x + 54 * s} ${y + 6 * s} C ${x + 46 * s} ${y - 24 * s}, ${x + 24 * s} ${y - 22 * s}, ${x + 12 * s} ${y - 36 * s} C ${x - 2 * s} ${y - 22 * s}, ${x - 30 * s} ${y - 26 * s}, ${x - 54 * s} ${y + 6 * s} Z" fill="${c}"/>
+      <path d="M${x - 30 * s} ${y - 52 * s} Q ${x - 8 * s} ${y - 62 * s} ${x + 14 * s} ${y - 54 * s}" stroke="#fff" stroke-width="${4 * s}" fill="none" stroke-linecap="round" opacity=".22"/>`],
   ben: [
     (x, y, s, c) => '',
     (x, y, s, c) => `<path d="M${x - 52 * s} ${y - 4 * s} L${x - 58 * s} ${y - 48 * s} L${x - 34 * s} ${y - 58 * s} L${x - 26 * s} ${y - 84 * s} L${x} ${y - 66 * s} L${x + 18 * s} ${y - 86 * s} L${x + 30 * s} ${y - 60 * s} L${x + 56 * s} ${y - 62 * s} L${x + 52 * s} ${y - 6 * s} C ${x + 30 * s} ${y - 36 * s}, ${x - 30 * s} ${y - 36 * s}, ${x - 52 * s} ${y - 4 * s} Z" fill="${c}"/>`],
   long: [
     (x, y, s, c) => `<path d="M${x - 60 * s} ${y + 110 * s} C ${x - 80 * s} ${y - 40 * s}, ${x - 40 * s} ${y - 82 * s}, ${x} ${y - 80 * s} C ${x + 40 * s} ${y - 82 * s}, ${x + 80 * s} ${y - 40 * s}, ${x + 60 * s} ${y + 110 * s} Z" fill="${c}"/>`,
-    (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 10 * s} C ${x - 60 * s} ${y - 76 * s}, ${x + 60 * s} ${y - 76 * s}, ${x + 52 * s} ${y + 10 * s} C ${x + 40 * s} ${y - 30 * s}, ${x + 4 * s} ${y - 44 * s}, ${x} ${y - 44 * s} C ${x - 4 * s} ${y - 44 * s}, ${x - 40 * s} ${y - 30 * s}, ${x - 52 * s} ${y + 10 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 10 * s} C ${x - 60 * s} ${y - 92 * s}, ${x + 60 * s} ${y - 92 * s}, ${x + 52 * s} ${y + 10 * s} C ${x + 40 * s} ${y - 30 * s}, ${x + 4 * s} ${y - 44 * s}, ${x} ${y - 44 * s} C ${x - 4 * s} ${y - 44 * s}, ${x - 40 * s} ${y - 30 * s}, ${x - 52 * s} ${y + 10 * s} Z" fill="${c}"/>`],
   old: [
     (x, y, s, c) => `<circle cx="${x}" cy="${y - 64 * s}" r="${24 * s}" fill="${c}"/>`,
-    (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 2 * s} C ${x - 60 * s} ${y - 66 * s}, ${x + 60 * s} ${y - 66 * s}, ${x + 52 * s} ${y + 2 * s} C ${x + 40 * s} ${y - 28 * s}, ${x - 40 * s} ${y - 28 * s}, ${x - 52 * s} ${y + 2 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 2 * s} C ${x - 60 * s} ${y - 86 * s}, ${x + 60 * s} ${y - 86 * s}, ${x + 52 * s} ${y + 2 * s} C ${x + 40 * s} ${y - 28 * s}, ${x - 40 * s} ${y - 28 * s}, ${x - 52 * s} ${y + 2 * s} Z" fill="${c}"/>`],
   short: [
     (x, y, s, c) => '',
-    (x, y, s, c) => `<path d="M${x - 51 * s} ${y - 2 * s} C ${x - 56 * s} ${y - 70 * s}, ${x + 56 * s} ${y - 72 * s}, ${x + 51 * s} ${y - 4 * s} C ${x + 36 * s} ${y - 30 * s}, ${x - 36 * s} ${y - 34 * s}, ${x - 51 * s} ${y - 2 * s} Z" fill="${c}"/>`],
+    (x, y, s, c) => `<path d="M${x - 51 * s} ${y - 2 * s} C ${x - 58 * s} ${y - 86 * s}, ${x + 58 * s} ${y - 86 * s}, ${x + 51 * s} ${y - 4 * s} C ${x + 36 * s} ${y - 30 * s}, ${x - 36 * s} ${y - 34 * s}, ${x - 51 * s} ${y - 2 * s} Z" fill="${c}"/>`],
   pony: [
     (x, y, s, c) => `<path d="M${x + 40 * s} ${y - 40 * s} C ${x + 110 * s} ${y - 40 * s}, ${x + 100 * s} ${y + 40 * s}, ${x + 70 * s} ${y + 70 * s}" stroke="${c}" stroke-width="${26 * s}" fill="none" stroke-linecap="round"/>`,
-    (x, y, s, c) => `<path d="M${x - 51 * s} ${y} C ${x - 56 * s} ${y - 72 * s}, ${x + 56 * s} ${y - 72 * s}, ${x + 51 * s} ${y} C ${x + 30 * s} ${y - 40 * s}, ${x - 30 * s} ${y - 40 * s}, ${x - 51 * s} ${y} Z" fill="${c}"/><circle cx="${x + 46 * s}" cy="${y - 40 * s}" r="${8 * s}" fill="${SUN}"/>`],
+    (x, y, s, c) => `<path d="M${x - 51 * s} ${y} C ${x - 58 * s} ${y - 86 * s}, ${x + 58 * s} ${y - 86 * s}, ${x + 51 * s} ${y} C ${x + 30 * s} ${y - 40 * s}, ${x - 30 * s} ${y - 40 * s}, ${x - 51 * s} ${y} Z" fill="${c}"/><circle cx="${x + 46 * s}" cy="${y - 40 * s}" r="${8 * s}" fill="${SUN}"/>`],
   bald: [(x, y, s, c) => '', (x, y, s, c) => `<path d="M${x - 52 * s} ${y + 4 * s} C ${x - 56 * s} ${y - 20 * s}, ${x - 50 * s} ${y - 30 * s}, ${x - 46 * s} ${y - 30 * s} L${x - 44 * s} ${y + 4 * s} Z M${x + 52 * s} ${y + 4 * s} C ${x + 56 * s} ${y - 20 * s}, ${x + 50 * s} ${y - 30 * s}, ${x + 46 * s} ${y - 30 * s} L${x + 44 * s} ${y + 4 * s} Z" fill="${c}"/>`],
 };
 
@@ -175,8 +192,8 @@ function person(o) {
   // Hals
   g += `<rect x="${x - 15 * s}" y="${n - 26 * s}" width="${30 * s}" height="${30 * s}" fill="${shade}"/>`;
   // Arme (Ärmel + Hand)
-  const L = 70 * s, shY = n + 32 * s;
-  const hL = o.hL || [x - 54 * s, n + 200 * s], hR = o.hR || [x + 54 * s, n + 200 * s];
+  const L = 90 * s, shY = n + 32 * s;   // Ober- + Unterarm = 180·s: Hand hängt bis zur Hüfte
+  const hL = reach(x - 50 * s, shY, o.hL || [x - 56 * s, n + 200 * s], L, 'person ' + (o.hair || '')), hR = reach(x + 50 * s, shY, o.hR || [x + 56 * s, n + 200 * s], L, 'person ' + (o.hair || ''));
   const drawArm = (sx, h, side) => { const [ex, ey] = elbow(sx, shY, h[0], h[1], L, side);
     return `<path d="M${sx} ${shY} L${ex} ${ey} L${h[0]} ${h[1]}" stroke="${shirtD}" stroke-width="${35 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
       <path d="M${sx} ${shY} L${ex} ${ey} L${h[0]} ${h[1]}" stroke="${shirt}" stroke-width="${29 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -203,6 +220,7 @@ function person(o) {
   const brow = { neutral: [0, 0], up: [-8, -8], worried: [6, -6], angry: [-6, 6], sad: [6, -4] }[bw] || [0, 0];
   face += `<path d="M${ex - 28 * s} ${by + brow[0] * s * .3} L${ex - 9 * s} ${by + brow[1] * s * .5 - 2 * s}" stroke="${bc}" stroke-width="${5 * s}" stroke-linecap="round"/>
     <path d="M${ex + 9 * s} ${by + brow[1] * s * .5 - 2 * s} L${ex + 28 * s} ${by + brow[0] * s * .3}" stroke="${bc}" stroke-width="${5 * s}" stroke-linecap="round"/>`;
+  if (o.beard) face += (HAIR[o.beard] || HAIR.beard[1])(x, hy - 2 * s, s, typeof o.beard === 'string' ? hc : mix(hc, o.skin || '#f2c6a0', .25), x + ldx * .8 * s);
   // Nase
   face += `<path d="M${ex + 2 * s} ${ey + 8 * s} Q ${ex + 8 * s} ${ey + 20 * s} ${ex} ${ey + 22 * s}" stroke="${shade}" stroke-width="${4 * s}" fill="none" stroke-linecap="round"/>`;
   // Mund
@@ -216,16 +234,8 @@ function person(o) {
     sad: `<path d="M${mx - 13 * s} ${my + 6 * s} Q ${mx} ${my - 6 * s} ${mx + 13 * s} ${my + 6 * s}" stroke="#7a2e2e" stroke-width="${4.5 * s}" fill="none" stroke-linecap="round"/>`,
     talk: `<ellipse cx="${mx}" cy="${my + 2 * s}" rx="${11 * s}" ry="${(3 + 6 * Math.abs(Math.sin((o.t || 0) * 14))) * s}" fill="#7a2e2e"/>`,
   };
-  // Bart: wandert mit der Blickrichtung mit (wie Augen und Mund), bleibt innerhalb der Kopfform, liegt unter dem Mund
-  if (o.beard) {
-    const cid = 'bc' + Math.round(x * 7 + n * 3 + s * 100);
-    face += `<clipPath id="${cid}"><ellipse cx="${x}" cy="${hy}" rx="${50 * s}" ry="${58 * s}"/></clipPath>
-      <g clip-path="url(#${cid})">${HAIR.beard[1](x + ldx * s * .75, hy + ldy * s * .5, s, hc)}</g>`;
-  }
   face += mouths[o.mouth || 'smile'];
   if (o.age) face += `<path d="M${ex - 34 * s} ${ey + 4 * s} l -8 4 M${ex + 34 * s} ${ey + 4 * s} l 8 4 M${mx - 22 * s} ${my - 6 * s} q -4 8 2 14 M${mx + 22 * s} ${my - 6 * s} q 4 8 -2 14" stroke="${shade}" stroke-width="${3 * s}" fill="none" opacity="${o.age}" stroke-linecap="round"/>`;
-  // Haarkappe: schließt den Scheitel, damit bei keiner Frisur Haut oben durchblitzt (keine "Glatzenstellen")
-  if ((o.hair || 'short') !== 'bald') face += `<path d="M${x - 40 * s} ${hy - 34 * s} C ${x - 46 * s} ${hy - 72 * s}, ${x + 46 * s} ${hy - 72 * s}, ${x + 40 * s} ${hy - 34 * s} Z" fill="${hc}"/>`;
   face += hairs[1](x, hy, s, hc);
   if (o.glasses) face += `<g stroke="#1a1420" stroke-width="${3.5 * s}" fill="#fff" fill-opacity=".12"><circle cx="${ex - 18 * s}" cy="${ey}" r="${15 * s}"/><circle cx="${ex + 18 * s}" cy="${ey}" r="${15 * s}"/><line x1="${ex - 3 * s}" y1="${ey}" x2="${ex + 3 * s}" y2="${ey}"/></g>`;
   if (o.hat) face += o.hat(x, hy, s);
@@ -261,8 +271,8 @@ function robot(o) {
     <circle cx="${x - 6 * s}" cy="${n + 84 * s}" r="${20 * s}" fill="${dark}"/>
     <circle cx="${x - 6 * s}" cy="${n + 84 * s}" r="${12 * s}" fill="${MINT}" opacity="${pw * (.6 + .4 * Math.sin(t * 3))}"/>
     <circle cx="${x - 6 * s}" cy="${n + 84 * s}" r="${36 * s}" fill="${MINT}" opacity="${pw * .16}" filter="url(#soft)"/>`;
-  const L = 78 * s, shY = n + 40 * s;
-  const hL = o.hL || [x - 62 * s, n + 196 * s], hR = o.hR || [x + 62 * s, n + 196 * s];
+  const L = 90 * s, shY = n + 40 * s;
+  const hL = reach(x - 58 * s, shY, o.hL || [x - 64 * s, n + 204 * s], L, 'robot'), hR = reach(x + 58 * s, shY, o.hR || [x + 64 * s, n + 204 * s], L, 'robot');
   const arm = (side, h) => {
     const sx = x + side * 58 * s, p = armPath(sx, shY, h[0], h[1], L, side > 0 ? -1 : 1);
     return `<path d="${p}" stroke="${shade}" stroke-width="${28 * s}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>

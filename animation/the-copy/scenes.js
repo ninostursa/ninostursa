@@ -5,31 +5,33 @@ const camLerp = (k, a, b) => [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2
 
 // ======================= ESSZIMMER =======================
 const TY = 700, FLOOR = 990, SEATY = 780;   // Tischkante, Boden, Sitzhöhe                      // Tischkante
-const SEAT = { mom: 430, lily: 800, ben: 1150, bot: 1500 };
+const SEAT = { mom: 290, lily: 740, ben: 1180, bot: 1575 };
+const TBL = 420, TBR = 1500;   // Tischenden: Mama und Papa sitzen am Kopf
 const eat = (t, ph) => { const c = ((t + ph) % 2.6) / 2.6; return c < .5 ? ease(c * 2) : ease((1 - c) * 2); };
 
+const WX = 340, WY = -50;   // Fenster: nach rechts und etwas nach oben verschoben
 function room(t, dayK = 0) {
-  let s = `<linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c1f33"/><stop offset=".65" stop-color="#5a3446"/><stop offset="1" stop-color="#6e3d4a"/></linearGradient>
+  let s = `<linearGradient id="wall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5a5e"/><stop offset=".6" stop-color="#c58a74"/><stop offset="1" stop-color="#d49a7c"/></linearGradient>
   <rect x="-400" y="-400" width="${W + 800}" height="${FLOOR + 400}" fill="url(#wall)"/>`;
-  for (let i = -4; i < 24; i++) s += `<rect x="${i * 100}" y="-400" width="34" height="${FLOOR + 400}" fill="#fff" opacity=".022"/>`;
-  const top = mix('#101a3d', '#6fc3ff', dayK), bot = mix('#2a2d5e', '#ffd6a0', dayK);
+  for (let i = -4; i < 24; i++) s += `<rect x="${i * 100}" y="-400" width="34" height="${FLOOR + 400}" fill="#fff" opacity=".045"/>`;
+  const top = mix('#4a5aa8', '#6fc3ff', dayK), bot = mix('#ffb07a', '#ffd6a0', dayK);
   s += `<linearGradient id="win" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${top}"/><stop offset="1" stop-color="${bot}"/></linearGradient>
-  <rect x="80" y="120" width="300" height="360" rx="16" fill="#1c1420"/><rect x="96" y="136" width="268" height="328" rx="8" fill="url(#win)"/>`;
+  <rect x="${80 + WX}" y="${120 + WY}" width="300" height="360" rx="16" fill="#f3e6d6"/><rect x="${96 + WX}" y="${136 + WY}" width="268" height="328" rx="8" fill="url(#win)"/>`;
   const R = rng(11);
-  for (let i = 0; i < 26; i++) { const sx = 100 + R() * 260, sy = 140 + R() * 300, ph = R() * 6; s += `<circle cx="${sx}" cy="${sy}" r="${1 + R() * 2}" fill="#fff" opacity="${(1 - dayK) * (.4 + .5 * Math.sin(t * 2 + ph) ** 2)}"/>`; }
-  s += `<circle cx="300" cy="200" r="30" fill="${dayK > .5 ? '#fff4c2' : '#f2f0e6'}"/>
-  <rect x="225" y="136" width="10" height="328" fill="#1c1420"/><rect x="96" y="295" width="268" height="10" fill="#1c1420"/>`;
+  for (let i = 0; i < 26; i++) { const sx = WX + 100 + R() * 260, sy = WY + 140 + R() * 300, ph = R() * 6; s += `<circle cx="${sx}" cy="${sy}" r="${1 + R() * 2}" fill="#fff" opacity="${(1 - dayK) * (.2 + .3 * Math.sin(t * 2 + ph) ** 2) * (sy < 300 + WY ? 1 : 0)}"/>`; }
+  s += `<circle cx="${300 + WX}" cy="${200 + WY}" r="30" fill="${dayK > .5 ? '#fff4c2' : '#f2f0e6'}"/>
+  <rect x="${225 + WX}" y="${136 + WY}" width="10" height="328" fill="#f3e6d6"/><rect x="${96 + WX}" y="${295 + WY}" width="268" height="10" fill="#f3e6d6"/>`;
   return s;
 }
 function lamp(t) {
   return `<line x1="960" y1="-400" x2="960" y2="215" stroke="#1a1018" stroke-width="6"/>
-    <polygon points="260,${TY + 6} 1660,${TY + 6} 1040,300 880,300" fill="#ffe2b0" opacity=".16"/>
-    <ellipse cx="960" cy="${TY - 200}" rx="900" ry="440" fill="url(#lampGlow)" opacity=".7"/>
+    <polygon points="${TBL + 40},${TY + 6} ${TBR - 40},${TY + 6} 1040,300 880,300" fill="#fff0c8" opacity=".24"/>
+    <ellipse cx="960" cy="${TY - 220}" rx="1250" ry="700" fill="url(#lampGlow)"/><ellipse cx="960" cy="330" rx="160" ry="90" fill="#fff3c8" opacity=".35" filter="url(#glow)"/>
     <path d="M880 215 L1040 215 L1100 305 L820 305 Z" fill="${CORAL}"/><path d="M990 215 L1040 215 L1100 305 L1030 305 Z" fill="#e0603f"/>
     <ellipse cx="960" cy="308" rx="52" ry="14" fill="#fff6d8"/>`;
 }
 // Bilderrahmen; Nr. 0 = Papa (Gold), weitere erscheinen im Zeitraffer
-const FRAMES = [[1700, 190, 'dad'], [1830, 260, 'a'], [1610, 300, 'b'], [1280, 170, 'mom'], [1420, 210, 'c'], [1880, 110, 'd']];
+const FRAMES = [[1480, 190, 'dad'], [1620, 260, 'a'], [1355, 345, 'b'], [1240, 140, 'mom'], [1780, 200, 'c'], [1640, 95, 'd']];
 function frames(n, hl = 0) {
   let s = '';
   FRAMES.forEach(([fx, fy, who], i) => {
@@ -47,25 +49,38 @@ function frames(n, hl = 0) {
 }
 function miniFace(who) {
   const cfg = { dad: ['dad', '#3b2a24', '#f2c6a0', CORAL], mom: ['mom', '#8a5a3c', '#f6d1b0', '#3fae7a'], a: ['short', '#222', '#c98d64', '#4cc9f0'], b: ['long', '#e0b050', '#f6d1b0', '#b07cff'], c: ['ben', '#5a3a2a', '#e8b48c', SUN], d: ['pony', '#222', '#8d5a3c', CORAL] }[who] || ['short', '#333', '#f2c6a0', '#888'];
-  return person({ x: 0, neck: 76, hair: cfg[0], hairCol: cfg[1], skin: cfg[2], shirt: cfg[3], beard: who === 'dad', mouth: 'smile' });
+  return person({ x: 0, neck: 76, hair: cfg[0], hairCol: cfg[1], skin: cfg[2], shirt: cfg[3], beard: who === 'dad' ? 'full' : false, mouth: 'smile' });
 }
 function plant(k) {
   const sc = lerp(.9, 2.0, k); let l = '';
   for (let i = 0; i < 7; i++) l += `<g transform="rotate(${-90 + (i - 3) * 24})"><ellipse cx="${55 + (i % 3) * 18}" cy="0" rx="${55 + (i % 3) * 18}" ry="20" fill="${i % 2 ? '#3fae7a' : '#2e8c62'}"/></g>`;
   return `<g transform="translate(1860 ${FLOOR - 86}) scale(${sc})">${l}<path d="M-42 0 L42 0 L32 86 L-32 86 Z" fill="#c8643f"/></g>`;
 }
-function table() {
-  return `<rect x="220" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/><rect x="1706" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/>
-    <rect x="150" y="${TY}" width="1660" height="28" rx="10" fill="#f9f3ea"/>
-    <rect x="164" y="${TY + 24}" width="1632" height="40" fill="#efe5d6"/>
-    <rect x="164" y="${TY + 24}" width="1632" height="10" fill="#000" opacity=".08"/>
-    <rect x="164" y="${TY + 56}" width="1632" height="18" fill="${CORAL}"/>
-    ${Array.from({ length: 41 }, (_, i) => `<circle cx="${184 + i * 40}" cy="${TY + 74}" r="10" fill="${CORAL}"/>`).join('')}`;
+function table(TBL_ = TBL, TBR_ = TBR) {
+  const TBL = TBL_, TBR = TBR_, w = TBR - TBL, n = Math.floor((w - 40) / 40) + 1;
+  return `<rect x="${TBL + 50}" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/><rect x="${TBR - 84}" y="${TY + 60}" width="34" height="${FLOOR - TY - 60}" fill="#5a3a2e"/>
+    <rect x="${TBL}" y="${TY}" width="${w}" height="28" rx="10" fill="#f9f3ea"/>
+    <rect x="${TBL + 14}" y="${TY + 24}" width="${w - 28}" height="40" fill="#efe5d6"/>
+    <rect x="${TBL + 14}" y="${TY + 24}" width="${w - 28}" height="10" fill="#000" opacity=".08"/>
+    <rect x="${TBL + 14}" y="${TY + 56}" width="${w - 28}" height="18" fill="${CORAL}"/>
+    ${Array.from({ length: n }, (_, i) => `<circle cx="${TBL + 34 + i * 40}" cy="${TY + 74}" r="10" fill="${CORAL}"/>`).join('')}`;
+}
+// Mitte des Tisches: Auflaufform mit Dampf, Brotkorb, Kerze
+function tableCenter(t) {
+  const st = [0, 1, 2].map(i => { const k = ((t * .35 + i / 3) % 1); return `<path d="M${930 + i * 30} ${TY - 70 - k * 60} q 10 -14 0 -28 q -10 -14 0 -28" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity="${.25 * Math.sin(k * Math.PI)}"/>`; }).join('');
+  // große Spaghetti-Schüssel ("Spaghetti, as always")
+  return `${st}<ellipse cx="960" cy="${TY - 66}" rx="70" ry="26" fill="#f4d27a"/>
+    ${[-40, -14, 12, 38].map((dx, i) => `<path d="M${960 + dx - 26} ${TY - 64} q 14 -${18 + i * 3} 28 -4 q 12 14 24 -2" stroke="#e8b84e" stroke-width="5" fill="none" stroke-linecap="round"/>`).join('')}
+    <ellipse cx="972" cy="${TY - 82}" rx="30" ry="14" fill="#d9442f"/><circle cx="948" cy="${TY - 80}" r="9" fill="#8a3a2a"/><circle cx="984" cy="${TY - 88}" r="8" fill="#8a3a2a"/><path d="M990 ${TY - 96} l 10 -8 l 4 10 z" fill="#3fae7a"/>
+    <path d="M876 ${TY - 64} L1044 ${TY - 64} C 1040 ${TY - 20}, 1010 ${TY - 2}, 960 ${TY - 2} C 910 ${TY - 2}, 880 ${TY - 20}, 876 ${TY - 64} Z" fill="#f7f3ec"/>
+    <path d="M880 ${TY - 50} L1040 ${TY - 50} L1036 ${TY - 40} L884 ${TY - 40} Z" fill="${CORAL}" opacity=".85"/>
+    ${[852, 1068].map((cx, i) => `<rect x="${cx - 7}" y="${TY - 96}" width="14" height="94" rx="4" fill="#fff3dd"/><ellipse cx="${cx}" cy="${TY - 108 + Math.sin(t * 7 + i) * 1.5}" rx="7" ry="12" fill="${SUN}"/><circle cx="${cx}" cy="${TY - 108}" r="34" fill="${SUN}" opacity="${.14 + .04 * Math.sin(t * 9 + i)}"/>`).join('')}`;
 }
 function floorAndChairs(seats) {
-  let s = `<rect x="-400" y="${FLOOR}" width="${W + 800}" height="600" fill="#3a2630"/><rect x="-400" y="${FLOOR - 14}" width="${W + 800}" height="16" fill="#2a1a22"/>`;
-  for (let i = 0; i < 6; i++) s += `<rect x="-400" y="${FLOOR + 22 + i * 30}" width="${W + 800}" height="3" fill="#000" opacity=".15"/>`;
-  s += `<ellipse cx="960" cy="${FLOOR + 6}" rx="900" ry="26" fill="#000" opacity=".25"/>`;
+  let s = `<rect x="-400" y="${FLOOR}" width="${W + 800}" height="600" fill="#8a5a42"/><rect x="-400" y="${FLOOR - 14}" width="${W + 800}" height="16" fill="#6b4232"/>`;
+  for (let i = 0; i < 6; i++) s += `<rect x="-400" y="${FLOOR + 22 + i * 30}" width="${W + 800}" height="3" fill="#000" opacity=".1"/>`;
+  s += `<ellipse cx="960" cy="${FLOOR + 6}" rx="900" ry="26" fill="#000" opacity=".15"/>`;
+  s += `<ellipse cx="960" cy="${FLOOR + 30}" rx="860" ry="44" fill="#c8574a"/><ellipse cx="960" cy="${FLOOR + 30}" rx="820" ry="34" fill="none" stroke="${SUN}" stroke-width="4" stroke-dasharray="16 12" opacity=".7"/>`;
   seats.forEach(x => s += `<rect x="${x - 92}" y="${SEATY - 290}" width="184" height="300" rx="34" fill="#5a3a2e"/><rect x="${x - 76}" y="${SEATY - 274}" width="152" height="268" rx="26" fill="#6b4636"/>
     <rect x="${x - 100}" y="${SEATY + 4}" width="200" height="26" rx="10" fill="#5a3a2e"/>
     <rect x="${x - 92}" y="${SEATY + 28}" width="18" height="${FLOOR - SEATY - 30}" fill="#4a2e24"/><rect x="${x + 74}" y="${SEATY + 28}" width="18" height="${FLOOR - SEATY - 30}" fill="#4a2e24"/>`);
@@ -79,8 +94,8 @@ function family(t, st) {
   const rest = (x, sc) => ({ hL: [x - 58 * sc, TY - 4], hR: [x + 58 * sc, TY - 4] });
   if (st.momOp > 0) {
     s += person({ x: SEAT.mom, neck: N, hair: 'mom', hairCol: mix('#8a5a3c', '#d8d8de', st.momGrey || 0), skin: '#f6d1b0', shirt: '#3fae7a', t,
-      look: st.momLook || [6, 0], mouth: st.momMouth || 'smile', brows: st.momBrows, blink: blinkAt(t, 1), op: st.momOp, age: st.momGrey,
-      legs: 'sit', foot: FLOOR, pants: '#3a3550', ...rest(SEAT.mom, 1) });
+      look: st.momLook || [12, 0], mouth: st.momMouth || 'smile', brows: st.momBrows, blink: blinkAt(t, 1), op: st.momOp, age: st.momGrey,
+      legs: 'sit', foot: FLOOR, pants: '#3a3550', hL: [SEAT.mom - 34, SEATY - 26], hR: [TBL + 30, TY - 4] });
   }
   if (st.lilyOp > 0) {
     const ls = st.lilyS || .8, ln = SEATY - 230 * ls;
@@ -100,20 +115,20 @@ function family(t, st) {
 
 // Roboter am Tisch inkl. Öl-Handlung. st.pour/st.drink 0..1
 function botAtTable(t, st) {
-  const bx = SEAT.bot, n = SEATY - 205, CAN = [1700, TY + 4], GL = [1620, TY + 2];
-  let hR = [bx + 84, TY + 44], hL = [bx - 84, TY + 44], can = CAN, canTilt = 0, gp = GL, gTilt = 0, level = st.level ?? .7;
+  const bx = SEAT.bot, n = SEATY - 205, CAN = [TBR - 46, TY + 4], GL = [TBR - 120, TY + 2];
+  let hR = [bx + 62, SEATY - 36], hL = [TBR - 10, TY - 4], can = CAN, canTilt = 0, gp = GL, gTilt = 0, level = st.level ?? .7;
   if (st.reach > 0) {
-    can = [lerp(CAN[0], 1660, st.lift || 0), lerp(CAN[1], TY - 150, st.lift || 0)];
+    can = [lerp(CAN[0], GL[0] + 40, st.lift || 0), lerp(CAN[1], TY - 150, st.lift || 0)];
     canTilt = -55 * (st.pour || 0);
-    hR = [lerp(hR[0], can[0], st.reach), lerp(hR[1], can[1] - 40, st.reach)];
+    hL = [lerp(hL[0], can[0], st.reach), lerp(hL[1], can[1] - 40, st.reach)];
   }
   if (st.drink > 0) {
-    gp = [lerp(GL[0], bx + 40, st.drink), lerp(GL[1], n - 60, st.drink)]; gTilt = -60 * st.drink;
-    hR = [gp[0] + 12, gp[1] - 40];
+    gp = [lerp(GL[0], bx - 40, st.drink), lerp(GL[1], n - 60, st.drink)]; gTilt = 60 * st.drink;
+    hL = [gp[0] - 12, gp[1] - 40];
   }
-  if (st.wave > 0) hL = [lerp(hL[0], bx - 120 + Math.sin(t * 11) * 22, st.wave), lerp(hL[1], n - 70, st.wave)];
+  if (st.wave > 0) hR = [lerp(hR[0], bx + 120 + Math.sin(t * 11) * 22, st.wave), lerp(hR[1], n - 70, st.wave)];
   if (st.hRover) hR = st.hRover;
-  let s = robot({ x: bx, neck: n, s: .92, t, legs: 'sit', foot: FLOOR, eyes: st.eyes || 'on', look: st.look || [-4, 0], blink: blinkAt(t, 6), hR, hL, steam: st.steam || 0,
+  let s = robot({ x: bx, neck: n, s: .92, t, legs: 'sit', foot: FLOOR, eyes: st.eyes || 'on', look: st.look || [-10, 0], blink: blinkAt(t, 6), hR, hL, steam: st.steam || 0,
     mouth: st.mouth, patch: st.patch, item: st.item, screen: st.screen });
   if ((st.pour || 0) > .3) {
     const a = (canTilt - 42) * Math.PI / 180, sx = can[0] + Math.cos(a) * 150, sy = can[1] + Math.sin(a) * 150;
@@ -127,7 +142,8 @@ function dinnerBase(t, o) {
   let s = room(t, o.dayK || 0) + frames(o.frames ?? 3, o.dadHl || 0) + lamp(t) + floorAndChairs([SEAT.mom, SEAT.lily, SEAT.ben, SEAT.bot]) + plant(o.plant || 0);
   s += family(t, o.fam);
   s += botAtTable(t, o.bot);
-  s += plate(SEAT.mom, TY + 4, true, t, o.fam.momOp > 0 || o.platesAll ? 1 : 0);
+  s += tableCenter(t);
+  s += plate(TBL + 112, TY + 4, true, t, o.fam.momOp > 0 || o.platesAll ? 1 : 0);
   s += plate(SEAT.lily, TY + 4, true, t, o.fam.lilyOp > 0 ? 1 : 0);
   s += plate(SEAT.ben, TY + 4, true, t, o.fam.benOp > 0 || o.platesAll ? 1 : 0);
   s += table();
@@ -167,16 +183,16 @@ function sceneDinnerOpen(t) {
   let c = [1.0, 960, 540];
   const zBot = inOut(t, F('s01', .45), F('s01', .55), F('s01', .72), F('s01', .8));
   const zPh = inOut(t, F('s01', .74), F('s01', .84), E('s01') + .3, S('s02') + .3);
-  c = camLerp(ease(zBot), c, [1.45, 1500, 560]);
-  c = camLerp(ease(zPh), c, [1.9, 1700, 260]);
+  c = camLerp(ease(zBot), c, [1.45, SEAT.bot - 40, 560]);
+  c = camLerp(ease(zPh), c, [1.9, FRAMES[0][0], 260]);
   const zOil = inOut(t, r0 - .2, r0 + .4, d0 + 2.4, d0 + 3.2);
-  c = camLerp(zOil * .6, c, [1.35, 1560, 600]);
+  c = camLerp(zOil * .6, c, [1.35, 1460, 600]);
   const zLily = ease(prog(t, F('s03', .45), E('s03')));
-  c = camLerp(zLily * .7, c, [1.5, 800, 600]);
+  c = camLerp(zLily * .7, c, [1.5, SEAT.lily, 600]);
   c[0] *= 1 + .03 * Math.sin(t * .3);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot, dadHl: photoK })}
-    ${bubble(1360, 360, "…and then the toaster said: I'm toast!", joke, { robot: true, tail: 80, size: 34, maxW: 520 })}
-    ${photoK > 0 ? tag('IN LOVING MEMORY · 2077', 1585, 330, photoK, SUN) : ''}</g>`;
+    ${bubble(1400, 400, "…and then the toaster said: I'm toast!", joke, { robot: true, tail: 80, size: 34, maxW: 520 })}
+    ${photoK > 0 ? tag('IN LOVING MEMORY · 2077', FRAMES[0][0] - 115, 78, photoK, SUN) : ''}</g>`;
   s += headline(['WOULD YOU SIT', 'AT THIS TABLE?'], 960, 150, t, F('s03', .02), F('s03', .42), { size: 96 });
   return s;
 }
@@ -188,12 +204,12 @@ function sceneDinnerAd(t) {
   const box = ease(prog(t, a + .1, a + .6));
   const bot = {
     eyes: 'happy', mouth: 'talk', look: [0, 0], level: .5,
-    hRover: [lerp(SEAT.bot + 70, SEAT.bot + 150, box), lerp(TY - 8, 480, box)],
+    hRover: [lerp(SEAT.bot + 62, SEAT.bot + 130, box), lerp(SEATY - 36, 520, box)],
     item: (x, y) => box > 0 ? cereal(x + 30, y - 10, box) : '',
   };
-  const c = camLerp(ease(prog(t, a, a + 1.2)), [1.0, 960, 540], [1.45, 1440, 560]);
+  const c = camLerp(ease(prog(t, a, a + 1.2)), [1.0, 960, 540], [1.45, SEAT.bot - 60, 560]);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot })}
-    ${sparkles(1640, 390, t, box)}</g>`;
+    ${sparkles(SEAT.bot + 140, 390, t, box)}</g>`;
   s += tag('SPONSORED MESSAGE', 60, 60, prog(t, a + .4, a + .8), SUN);
   s += stamp('AD', 1720, 900, prog(t, F('s19r', .7), F('s19r', .8)), CORAL, 12, 90);
   return s;
@@ -228,7 +244,7 @@ function sceneDinnerLapse(t) {
   const kidIn = back(prog(k, .68, .78)), kid2 = back(prog(k, .74, .84));
   fam.extra = [];
   if (kidIn > 0) fam.extra.push(`<g transform="translate(${SEAT.mom} ${FLOOR}) scale(${kidIn}) translate(${-SEAT.mom} ${-FLOOR})">` +
-    person({ x: SEAT.mom, neck: SEATY - 230 * .78, s: .78, legs: 'sit', foot: FLOOR - 40, pants: '#2d3a5a', hair: 'short', hairCol: '#222', skin: '#c98d64', shirt: '#4cc9f0', look: [8, 0], blink: blinkAt(t, 8), mouth: 'grin', hL: [SEAT.mom - 46, TY - 4], hR: [SEAT.mom + 46, TY - 4] }) + '</g>');
+    person({ x: SEAT.mom, neck: SEATY - 230 * .78, s: .78, legs: 'sit', foot: FLOOR - 40, pants: '#2d3a5a', hair: 'short', hairCol: '#222', skin: '#c98d64', shirt: '#4cc9f0', look: [8, 0], blink: blinkAt(t, 8), mouth: 'grin', hL: [SEAT.mom - 36, SEATY - 30], hR: [TBL + 16, TY - 4] }) + '</g>');
   if (kid2 > 0) fam.extra.push(`<g transform="translate(${SEAT.ben} ${FLOOR}) scale(${kid2}) translate(${-SEAT.ben} ${-FLOOR})">` +
     person({ x: SEAT.ben, neck: SEATY - 230 * .76, s: .76, legs: 'sit', foot: FLOOR - 40, pants: '#3a3550', hair: 'long', hairCol: '#e0b050', skin: '#f6d1b0', shirt: '#b07cff', look: [10, -2], blink: blinkAt(t, 9), mouth: 'smile', hL: [SEAT.ben - 46, TY - 4], hR: [SEAT.ben + 46, TY - 4] }) + '</g>');
   // Roboter trinkt immer wieder
@@ -262,9 +278,9 @@ function sceneDinnerPayoff(t) {
   }
   fam.t = t;
   let c = [1.0, 960, 540];
-  c = camLerp(ease(prog(t, S('s24') - .4, S('s24') + .6)), c, [1.55, 800, 600]);
-  c = camLerp(ease(prog(t, S('s25') - .2, S('s25') + .8)), c, [1.7, 1480, 560]);
-  c = camLerp(ease(prog(t, F('s25', .84), E('s25'))), c, [2.0, 1500, 520]);
+  c = camLerp(ease(prog(t, S('s24') - .4, S('s24') + .6)), c, [1.55, SEAT.lily, 600]);
+  c = camLerp(ease(prog(t, S('s25') - .2, S('s25') + .8)), c, [1.7, SEAT.bot - 20, 560]);
+  c = camLerp(ease(prog(t, F('s25', .84), E('s25'))), c, [2.0, SEAT.bot, 520]);
   let s = `<g transform="${cam(...c)}">${dinnerBase(t, { fam, bot })}</g>`;
   s += bubble(760, 170, 'Dad? Are you still you?', inOut(t, S('s24') + .1, S('s24') + .4, E('s24') + 1.2, E('s24') + 1.5), { tail: 40, size: 44 });
   s += bubble(1240, 150, 'I think so.', inOut(t, S('s25') + .1, S('s25') + .4, F('s25', .4), F('s25', .45)), { robot: true, tail: 120, size: 40 });
@@ -308,7 +324,7 @@ function sceneChat(t) {
   // Joshua am Schreibtisch, vom Bildschirm angeleuchtet
   s += `<ellipse cx="560" cy="560" rx="420" ry="300" fill="${MINT}" opacity=".10" filter="url(#glow)"/>`;
   const typing = (t * 3) % 1 < .5;
-  s += person({ x: 560, neck: 560, s: 1.15, hair: 'short', hairCol: '#2a1c16', skin: '#f0c4a0', shirt: '#3a4256', beard: true, t,
+  s += person({ x: 560, neck: 625, s: 1.15, hair: 'short', hairCol: '#2a1c16', skin: '#f0c4a0', shirt: '#3a4256', t,
     look: [10, 6], mouth: t > F('s05', .78) ? 'smile' : 'flat', brows: t < F('s05', .5) ? 'worried' : 'neutral', blink: blinkAt(t, 2),
     hL: [470, 850 + (typing ? -6 : 0)], hR: [650, 850 + (typing ? 0 : -6)] });
   s += `<rect x="120" y="850" width="900" height="40" rx="10" fill="#4a3a5a"/><rect x="140" y="890" width="860" height="200" fill="#2a2040"/>
@@ -375,11 +391,11 @@ function sceneVR(t) {
   const reach = ease(prog(t, F('s07', .25), F('s07', .85)));
   const headset = (x, hy, sc) => `<rect x="${x - 64 * sc}" y="${hy - 26 * sc}" width="${128 * sc}" height="${52 * sc}" rx="${18 * sc}" fill="#1c1f2e"/><rect x="${x - 56 * sc}" y="${hy - 8 * sc}" width="${112 * sc}" height="8" rx="4" fill="${MINT}" opacity="${.6 + .4 * Math.sin(t * 5)}"/><rect x="${x - 70 * sc}" y="${hy - 8 * sc}" width="${140 * sc}" height="${12 * sc}" fill="#1c1f2e"/>`;
   s += person({ x: 640, neck: 380, s: 1.25, legs: 'stand', foot: 1000, hair: 'long', hairCol: '#141018', skin: '#f2cfae', shirt: '#7b6cff', pants: '#2b2b4a', t,
-    mouth: t > F('s07', .6) ? 'smile' : 'o', hL: [560, 640], hR: [lerp(740, 900, reach), lerp(640, 560, reach)], hat: (x, hy, sc) => headset(x, hy - 2 * sc, sc) });
+    mouth: t > F('s07', .6) ? 'smile' : 'o', hL: [560, 640], hR: [lerp(740, 860, reach), lerp(640, 560, reach)], hat: (x, hy, sc) => headset(x, hy - 2 * sc, sc) });
   // Mädchen aus Licht
   const gk = prog(t, F('s07', .12), F('s07', .35));
   s += `<g opacity="${gk * (.7 + .15 * Math.sin(t * 4))}" filter="url(#glowS)">${person({ x: 1260, neck: 600, s: .8, legs: 'stand', foot: 1000, hair: 'lily', hairCol: '#9ff7e0', skin: '#c9fff0', shirt: '#5ef2c8', pants: '#3fd6b0', blush: false, t,
-    look: [-10, -4], mouth: 'smile', blink: blinkAt(t, 7), hL: [lerp(1200, 1080, reach), lerp(760, 640, reach)], hR: [1310, 760] })}</g>`;
+    look: [-10, -4], mouth: 'smile', blink: blinkAt(t, 7), hL: [lerp(1200, 1090, reach), lerp(760, 640, reach)], hR: [1310, 760] })}</g>`;
   const R = rng(21);
   for (let i = 0; i < 30; i++) { const a = R() * 6.28, r = 80 + R() * 220, ph = R() * 6; s += `<circle cx="${1260 + Math.cos(a + t * .3) * r}" cy="${700 + Math.sin(a + t * .3) * r * .9 - ((t * 30 + ph * 40) % 120)}" r="${2 + R() * 4}" fill="${MINT}" opacity="${gk * .6}"/>`; }
   const touch = pulse(t, F('s07', .82), 1.2);
@@ -544,7 +560,7 @@ function sceneLab(t) {
   const rLook = t > S('s13r') - .3 ? [-10, 0] : [0, 0];
   const wave = inOut(t, S('s13r'), S('s13r') + .3, E('s13r') + .4, E('s13r') + .8);
   s += robot({ x: RX, neck: 560, t, power, eyes: t > S('s13r') ? 'happy' : 'on', look: rLook, legs: 'stand', foot: FLOOR - 50, mouth: t > S('s13r') && t < E('s13r') ? 'talk' : 'smile',
-    hR: wave > 0 ? [RX + 110 + Math.sin(t * 11) * 22, lerp(756, 420, wave)] : null });
+    hR: wave > 0 ? [RX + 110 + Math.sin(t * 11) * 22, lerp(740, 460, wave)] : null });
   s += `<g transform="translate(0 ${-glassUp * 1100})"><rect x="${RX - 150}" y="226" width="300" height="${FLOOR - 276}" rx="48" fill="${MINT}" opacity=".12" stroke="${MINT}" stroke-opacity=".5" stroke-width="4"/>
     <rect x="${RX - 120}" y="270" width="22" height="600" rx="11" fill="#fff" opacity=".16"/></g>`;
   if (flash > 0) s += `<rect x="${RX - 200}" y="140" width="400" height="${FLOOR - 100}" rx="70" fill="#e9fff8" opacity="${flash * .9}" filter="url(#soft)"/>`;
@@ -558,9 +574,9 @@ function sceneLab(t) {
     return `<path d="M${x - 66 * sc} ${hy - 4 * sc} A ${66 * sc} ${66 * sc} 0 0 1 ${x + 66 * sc} ${hy - 4 * sc} Z" fill="#cfd8e3"/><rect x="${x - 72 * sc}" y="${hy - 14 * sc}" width="${144 * sc}" height="${18 * sc}" rx="8" fill="#8796a8"/>
       ${[-1, 0, 1].map(i => `<circle cx="${x + i * 28 * sc}" cy="${hy - 50 * sc}" r="${8 * sc}" fill="${MINT}" opacity="${on}"/>`).join('')}`;
   };
-  s += person({ x: MX, neck: 560, s: 1.05, legs: 'sit', foot: FLOOR, hair: 'dad', hairCol: '#3b2a24', beard: true, shirt: CORAL, pants: '#2d3a5a', t,
+  s += person({ x: MX, neck: 560, s: 1.05, legs: 'sit', foot: FLOOR, hair: 'dad', hairCol: '#3b2a24', beard: 'full', shirt: CORAL, pants: '#2d3a5a', t,
     look: surprised ? [12, 0] : (scanK > 0 ? [0, -6] : [4, 0]), mouth: surprised ? 'o' : (scanK > 0 ? 'flat' : 'smile'), brows: surprised ? 'up' : (scanK > 0 ? 'worried' : 'neutral'),
-    blink: blinkAt(t, 0), hL: [MX - 46, 792], hR: [MX + 46, 792], sweat: scanK > .2 && scanK < .7 ? prog(scanK, .2, .7) : 0, hat: t < F('s13', .5) ? helmet : null });
+    blink: blinkAt(t, 0), hL: [MX - 46, 772], hR: [MX + 46, 772], sweat: scanK > .2 && scanK < .7 ? prog(scanK, .2, .7) : 0, hat: t < F('s13', .5) ? helmet : null });
   // Fortschritt
   const bk = inOut(t, F('s12', .28), F('s12', .34), F('s13', .6), F('s13', .7));
   if (bk > 0) {
@@ -604,7 +620,7 @@ function sceneTest2(t) {
   let s = bgGrad('t2', '#06121c', '#10283a') + grid(.035);
   s += testCard(2, 'CHANGE', t, S('s15') + .05);
   // Mensch links: lernt, vergisst, ändert Meinung
-  s += person({ x: 560, neck: 460, s: 1.05, legs: 'stand', foot: 1020, hair: 'dad', hairCol: '#3b2a24', beard: true, shirt: CORAL, t,
+  s += person({ x: 560, neck: 460, s: 1.05, legs: 'stand', foot: 1020, hair: 'dad', hairCol: '#3b2a24', beard: 'full', shirt: CORAL, t,
     look: [0, -6], mouth: 'smile', blink: blinkAt(t, 0), hL: [470, 640], hR: [650, 640],
     item: (x, y) => prog(t, F('s15', .2), F('s15', .25)) > 0 ? `<g transform="translate(${x - 90} ${y - 30})"><rect x="0" y="0" width="80" height="100" rx="6" fill="#4c6ef5"/><rect x="80" y="0" width="80" height="100" rx="6" fill="#5c7cff"/><line x1="80" y1="0" x2="80" y2="100" stroke="#fff" stroke-width="4"/></g>` : '' });
   const icon = (x, y, f, inner) => { const k = back(prog(t, F('s15', f), F('s15', f) + .3)); return k > 0 ? `<g transform="translate(${x} ${y}) scale(${k})">${inner}</g>` : ''; };
@@ -635,21 +651,21 @@ function sceneTwoDads(t) {
       <ellipse cx="0" cy="-20" rx="70" ry="84" fill="#e2ddd5"/><path d="M-60 10 C -60 110, 60 110, 60 10 C 40 40, -40 40, -60 10 Z" fill="#cfc8bf"/>
       <path d="M-30 -30 L-14 -30 M14 -30 L30 -30" stroke="#a69f95" stroke-width="6"/>${text('?', 90, -110, { size: 80, fill: SUN })}</g>`;
   });
-  s += testCard(3, 'TWO OF YOU', t, S('s16') + .05, 1590, 120);
+  s += testCard(3, 'TWO OF YOU', t, S('s16') + .05, 1500, 140);
   const look = t > F('s16', .35);
   const point = inOut(t, F('s16', .62), F('s16', .7), E('s16') + .2, E('s16') + .5);
   // Schlüssel / Pizza
   const keysK = inOut(t, S('s17') - .1, S('s17') + .3, F('s17', .3), F('s17', .36));
   const pizzaK = inOut(t, F('s17', .3), F('s17', .38), F('s17', .6), F('s17', .66));
   const tug = Math.sin(t * 9) * 18;
-  const midY = 620;
-  let dadHR = [700 + 60, 760], botHL = [1220 - 62, 756];
-  if (point > 0) { dadHR = [lerp(760, 900, point), lerp(760, 560, point)]; botHL = [lerp(1158, 1020, point), lerp(756, 560, point)]; }
+  const midY = 560;
+  let dadHR = [760 + 56 * 1.05, 440 + 200 * 1.05], botHL = [1160 - 64, 450 + 204];   // wie die andere, herabhängende Hand
+  if (point > 0) { dadHR = [lerp(dadHR[0], 900, point), lerp(dadHR[1], 560, point)]; botHL = [lerp(botHL[0], 1020, point), lerp(botHL[1], 560, point)]; }
   const grab = Math.max(keysK, pizzaK);
   if (grab > 0) { dadHR = [lerp(dadHR[0], 930 + tug, grab), lerp(dadHR[1], midY, grab)]; botHL = [lerp(botHL[0], 990 + tug, grab), lerp(botHL[1], midY, grab)]; }
-  s += person({ x: 700, neck: 440, s: 1.05, legs: 'stand', foot: 1000, hair: 'dad', hairCol: '#3b2a24', beard: true, shirt: CORAL, t,
+  s += person({ x: 760, neck: 440, s: 1.05, legs: 'stand', foot: 1000, hair: 'dad', hairCol: '#3b2a24', beard: 'full', shirt: CORAL, t,
     look: look ? [12, 0] : [0, 0], mouth: point > 0 || grab > 0 ? 'open' : (look ? 'o' : 'smile'), brows: grab > 0 || point > 0 ? 'angry' : 'up', blink: blinkAt(t, 0), hR: dadHR });
-  s += robot({ x: 1220, neck: 450, t, legs: 'stand', foot: 1000, look: look ? [-10, 0] : [0, 0], eyes: 'on', mouth: point > 0 || grab > 0 ? 'talk' : 'o', hL: botHL });
+  s += robot({ x: 1160, neck: 450, t, legs: 'stand', foot: 1000, look: look ? [-10, 0] : [0, 0], eyes: 'on', mouth: point > 0 || grab > 0 ? 'talk' : 'o', hL: botHL });
   if (keysK > 0) s += `<g transform="translate(${960 + tug} ${midY}) scale(${keysK})"><circle cx="0" cy="-20" r="26" fill="none" stroke="${SUN}" stroke-width="10"/><rect x="-8" y="0" width="16" height="70" rx="6" fill="${SUN}"/><rect x="8" y="40" width="20" height="10" fill="${SUN}"/><rect x="8" y="58" width="14" height="10" fill="${SUN}"/></g>`;
   if (pizzaK > 0) s += `<g transform="translate(${960 + tug} ${midY}) scale(${pizzaK})"><path d="M-60 -40 L60 -40 L0 80 Z" fill="#f2b84b"/><path d="M-66 -46 L66 -46 L60 -30 L-60 -30 Z" fill="#c8843a"/><circle cx="-14" cy="-6" r="12" fill="#d9472b"/><circle cx="16" cy="12" r="10" fill="#d9472b"/>
      <path d="M-60 -10 Q -80 ${20 + Math.abs(tug)} -100 0 M60 -10 Q 80 ${20 + Math.abs(tug)} 100 0" stroke="#ffe08a" stroke-width="6" fill="none"/></g>`;
@@ -854,7 +870,7 @@ function render(t) {
     <filter id="glow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="22"/></filter>
     <filter id="glowS" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
     <filter id="sepia"><feColorMatrix type="matrix" values=".39 .77 .19 0 0 .35 .69 .17 0 0 .27 .53 .13 0 0 0 0 0 1 0"/></filter>
-    <radialGradient id="lampGlow" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="#ffd79a" stop-opacity=".75"/><stop offset="1" stop-color="#ffd79a" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lampGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe3a8" stop-opacity=".8"/><stop offset=".45" stop-color="#ffd79a" stop-opacity=".35"/><stop offset="1" stop-color="#ffd79a" stop-opacity="0"/></radialGradient>
     <linearGradient id="tvShine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
     <linearGradient id="fog" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#10283a" stop-opacity="0"/><stop offset=".5" stop-color="#9fc" stop-opacity=".12"/><stop offset="1" stop-color="#cfe" stop-opacity=".25"/></linearGradient>
     <radialGradient id="vig" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
