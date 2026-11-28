@@ -26,6 +26,7 @@ Alle Dateien liegen in diesem Ordner (`patent-future/001-the-copy/`).
 
 1. **Erstellen → Videos hochladen** → `short.mp4` (YouTube erkennt das Hochformat automatisch als Short)
 2. Titel und Beschreibung aus `short-upload-text.txt`
+   **Titelbild:** `short-thumbnail.png` (Hochformat). In der YouTube-App beim Hochladen auf das Bild-Symbol bzw. „Titelbild“ tippen. Wenn kein eigenes Bild angeboten wird, ein Bild aus dem Short wählen, am besten das allererste mit „HE DIED 3 YEARS AGO.“
 3. **Ähnliches Video:** File 001 auswählen. Das ist der wichtigste Schritt, darüber kommen die Zuschauer zum ganzen Video.
 4. Nicht für Kinder · Synthetische Inhalte: Ja · Playlist: Patent Future Files
 5. Veröffentlichen

@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  svg { display: block; width: 720px; height: 1280px; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg"></svg>
+<script src="lib.js"></script>
+<script src="scenes.js"></script>
+<script>
+/* Short-Titelbild File 001 (9:16) – oben "HE DIED 3 YEARS AGO.", unten "SO WHO IS THIS?"
+ * Mitte: Roboter-Papa am Tisch mit Ölglas, Tochter schaut hoch, darüber das Trauerbild.
+ * Gerendert mit: node ../thumb.js the-copy/short-thumbnail.html <ziel.png> --vertical */
+const SW = 1080, SH = 1920;
+function thumb() {
+  const t = 1.3;
+  const LX = 1120, BX = 1590, TE = 1480;
+  const ls = .8, ln = SEATY - 230 * ls, bn = SEATY - 205;
+  const portrait = (x, y, sc) => `<g transform="translate(${x} ${y}) scale(${sc})">
+      <rect x="-110" y="-128" width="220" height="256" rx="30" fill="${SUN}" opacity=".35" filter="url(#glow)"/>
+      <rect x="-66" y="-80" width="132" height="160" rx="8" fill="#d9a84e"/>
+      <rect x="-54" y="-68" width="108" height="136" rx="4" fill="#f6e6c4"/>
+      <clipPath id="tp"><rect x="-54" y="-68" width="108" height="136" rx="4"/></clipPath>
+      <g clip-path="url(#tp)"><g transform="translate(0 -10) scale(.5)">${miniFace('dad')}</g></g>
+      <path d="M30 -80 L66 -80 L66 -44 Z" fill="#1a1018"/></g>`;
+  let world = room(t) + portrait(1600, 300, 1.4) + lamp(t) + floorAndChairs([LX, BX]) + plant(0);
+  world += person({ x: LX, neck: ln, s: ls, hair: 'lily', hairCol: '#c0642e', skin: '#f8d8bc', shirt: SUN, t,
+    look: [13, -6], mouth: 'o', brows: 'up', legs: 'sit', foot: FLOOR - 30, pants: '#4a5a8a',
+    hL: [LX - 58 * ls, TY - 4], hR: [LX + 58 * ls, TY - 4] });
+  const hR = [BX + 150, TY - 170];
+  world += robot({ x: BX, neck: bn, s: .92, t, legs: 'sit', foot: FLOOR, eyes: 'happy', look: [-6, 0], hR, hL: [TE - 10, TY - 4] });
+  world += glass(hR[0] + 6, hR[1] + 48, .8, '#b8860b', 0, 1.15);
+  world += oilCan(TE - 90, TY + 4, 0, .9);
+  world += plate(LX, TY + 4, true, t).replace(/<path d="[^"]*q 10 -12 0 -24[^>]*\/>/g, '');
+  world += table(-300, TE);
+  // Kamera: Mitte des Hochformats auf Tochter + Roboter + Bild
+  let s = `<g transform="translate(540 1000) scale(1.28) translate(-1400 -560)">${world}</g>`;
+  // Verläufe oben und unten für die Schrift
+  s += `<linearGradient id="top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#06121c" stop-opacity=".95"/><stop offset="1" stop-color="#06121c" stop-opacity="0"/></linearGradient>
+    <rect width="${SW}" height="560" fill="url(#top)"/>
+    <linearGradient id="bot" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#06121c" stop-opacity=".95"/><stop offset="1" stop-color="#06121c" stop-opacity="0"/></linearGradient>
+    <rect y="${SH - 520}" width="${SW}" height="520" fill="url(#bot)"/>`;
+  const hl = (str, y, col, size) => text(str, SW / 2, y, { size, fill: col, glow: col === MINT ? MINT : null, stroke: '#08121b' });
+  s += `<g transform="translate(${SW / 2} 90)"><rect x="-150" y="-36" width="300" height="72" rx="14" fill="#08121b" opacity=".85" stroke="${MINT}" stroke-width="4"/>
+    ${text('FILE 001', 0, 2, { size: 38, weight: 800, font: 'JetBrains Mono', fill: MINT, ls: 4 })}</g>`;
+  s += hl('HE DIED', 250, '#fff', 180);
+  s += hl('3 YEARS AGO.', 400, '#fff', 116);
+  s += hl('SO WHO', 1660, MINT, 150);
+  s += hl('IS THIS?', 1810, MINT, 150);
+  return s;
+}
+document.getElementById('stage').innerHTML = `<defs>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+    <filter id="glow" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation="22"/></filter>
+    <filter id="glowS" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <radialGradient id="lampGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe3a8" stop-opacity=".8"/><stop offset=".45" stop-color="#ffd79a" stop-opacity=".35"/><stop offset="1" stop-color="#ffd79a" stop-opacity="0"/></radialGradient>
+  </defs>` + thumb();
+</script>
+</body>
+</html>
